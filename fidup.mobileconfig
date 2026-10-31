@@ -146,7 +146,7 @@
 			<key>Precomposed</key>
 			<true/>
 			<key>URL</key>
-			<string>https://litupsrl.github.io/fidup/</string>
+			<string>https://litupsrl.github.io/fidup/?app=1</string>
 		</dict>
 	</array>
 	<key>PayloadDescription</key>

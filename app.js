@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -159,7 +159,7 @@ async function makeBackup() {
 }
 
 /* ---------- Navigazione ---------- */
-const VIEWS = ['lock', 'list', 'detail', 'edit', 'settings'];
+const VIEWS = ['gate', 'lock', 'list', 'detail', 'edit', 'settings'];
 function showView(name) {
   VIEWS.forEach((v) => { $('#view-' + v).hidden = v !== name; });
   window.scrollTo(0, 0);
@@ -178,6 +178,7 @@ function renderView(name) {
   showView(name);
 }
 window.addEventListener('popstate', (e) => {
+  if (!$('#view-gate').hidden) { history.replaceState({ view: 'gate' }, ''); return; }
   if (!S.data) { history.replaceState({ view: 'lock' }, ''); return; }
   const v = (e.state && e.state.view) || 'list';
   renderView(v === 'lock' ? 'list' : v);
@@ -766,14 +767,40 @@ function enterApp() {
     S.data = normalizeData({});
     await persist();
   }
+  if (Install.needsGate()) return showGate();
   enterApp();
 })();
+
+/** iPhone nel browser: niente carte, solo installazione dell'app (profilo). */
+function showGate() {
+  const safari = Install.isSafari() && !Install.isInApp();
+  const n = S.data.cards.length;
+  $('#gate-safari').hidden = !safari;
+  $('#gate-other').hidden = safari;
+  $('#gate-legacy').hidden = n === 0;
+  $('#gate-count').textContent = n === 1 ? '1 carta' : n + ' carte';
+  showView('gate');
+  history.replaceState({ view: 'gate' }, '');
+  // apre subito il download del profilo (una volta per sessione), se non ci sono carte da salvare prima
+  if (safari && n === 0 && !sessionStorage.getItem('gate_auto')) {
+    sessionStorage.setItem('gate_auto', '1');
+    setTimeout(() => { location.href = 'fidup.mobileconfig'; }, 400);
+  }
+}
 
 
 /* ---------- Installazione come app ---------- */
 const Install = {
   deferred: null,
-  standalone: () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true,
+  standalone() {
+    // app installata: modalità standalone, oppure avviata con ?app=1 (profilo iPhone / manifest)
+    const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true
+      || new URLSearchParams(location.search).get('app') === '1' || localStorage.getItem('is_app') === '1';
+    if (app) localStorage.setItem('is_app', '1');
+    return app;
+  },
+  isSafari: () => /Safari\//.test(navigator.userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|DuckDuckGo|YaBrowser/.test(navigator.userAgent),
+  needsGate() { return this.isIOS() && !this.standalone(); },
   isIOS: () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
   isAndroid: () => /Android/.test(navigator.userAgent),
   isInApp: () => /FBAN|FBAV|Instagram|Line\/|LinkedInApp|GSA\/|TikTok|Snapchat/.test(navigator.userAgent),

@@ -19,6 +19,40 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- iPhone nel browser: invita a installare l'app tramite profilo (i dati del browser sono separati da quelli dell'app) -->
+  <section id="view-gate" class="view auth" hidden>
+    <div class="auth-box">
+      <img src="icons/icon-192.png" alt="" class="logo">
+      <h1>FidUP!</h1>
+      <p class="muted">Su iPhone FidUP! si usa come app installata: le carte restano sul telefono e funzionano anche senza internet.</p>
+
+      <div id="gate-safari">
+        <a class="btn primary" href="fidup.mobileconfig" id="gate-install">📲 Installa FidUP!</a>
+        <ol class="steps left">
+          <li>Tocca <b>Consenti</b> per scaricare il profilo</li>
+          <li>Apri <b>Impostazioni</b> e tocca <b>Profilo scaricato</b> (in alto)</li>
+          <li>Tocca <b>Installa</b>, inserisci il codice del telefono e conferma</li>
+          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+        </ol>
+        <p class="muted small">iOS indica il profilo come "Non verificato": è normale, aggiunge solo l'icona di FidUP! alla schermata Home.</p>
+        <details class="small left">
+          <summary>Non riesci a installare il profilo?</summary>
+          <p>In Safari tocca <b>Condividi</b> (o prima <b>···</b>) → <b>Aggiungi alla schermata Home</b> → lascia attivo <b>Apri come app web</b> → <b>Aggiungi</b>.</p>
+        </details>
+      </div>
+
+      <div id="gate-other" hidden>
+        <p>Per installare FidUP! apri questa pagina in <b>Safari</b>.</p>
+        <button class="btn" data-action="copy-link">📋 Copia link</button>
+      </div>
+
+      <div id="gate-legacy" class="install" hidden>
+        <p class="small">Hai già <b id="gate-count"></b> salvate in questo browser. Prima di installare l'app esporta un backup, poi ripristinalo nell'app.</p>
+        <button class="btn" data-action="backup-share">📤 Esporta backup</button>
+      </div>
+    </div>
+  </section>
+
   <!-- AGGIORNAMENTO DALLA VERSIONE 1.0 (una sola volta) -->
   <section id="view-lock" class="view auth" hidden>
     <div class="auth-box">

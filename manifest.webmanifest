@@ -3,7 +3,7 @@
   "short_name": "FidUP!",
   "description": "FidUP! — carte fedeltà cifrate, salvate solo sul dispositivo",
   "lang": "it",
-  "start_url": "./",
+  "start_url": "./?app=1",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

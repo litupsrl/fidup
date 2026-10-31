@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://www.googleapis.com https://login.microsoftonline.com https://graph.microsoft.com https://*.1drv.com https://*.sharepoint.com; worker-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#1e3a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FidUP!">
+  <title>FidUP!</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- PRIMA CONFIGURAZIONE -->
+  <section id="view-setup" class="view auth" hidden>
+    <div class="auth-box">
+      <img src="icons/icon-192.png" alt="" class="logo">
+      <h1>FidUP!</h1>
+      <p class="muted">Le tue carte sono cifrate (AES-256) e salvate solo su questo dispositivo. Scegli una password principale.</p>
+      <form id="form-setup" autocomplete="off">
+        <input type="password" id="setup-pw" placeholder="Password principale (min. 8 caratteri)" minlength="8" required autocomplete="new-password">
+        <input type="password" id="setup-pw2" placeholder="Ripeti password" minlength="8" required autocomplete="new-password">
+        <p class="warn">⚠️ Se dimentichi la password i dati non sono recuperabili: nessuno (nemmeno lo sviluppatore) può decifrarli.</p>
+        <button type="submit" class="btn primary">Crea archivio cifrato</button>
+      </form>
+      <div class="sep">oppure</div>
+      <button class="btn" data-action="restore-file">Ripristina da file di backup</button>
+      <button class="btn" data-action="cloud-restore" data-provider="google">Ripristina da Google Drive</button>
+      <button class="btn" data-action="cloud-restore" data-provider="microsoft">Ripristina da OneDrive</button>
+    </div>
+  </section>
+
+  <!-- SBLOCCO -->
+  <section id="view-lock" class="view auth" hidden>
+    <div class="auth-box">
+      <img src="icons/icon-192.png" alt="" class="logo">
+      <h1>FidUP!</h1>
+      <form id="form-unlock" autocomplete="off">
+        <input type="password" id="unlock-pw" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" class="btn primary">Sblocca</button>
+      </form>
+      <p id="unlock-error" class="error" hidden></p>
+    </div>
+  </section>
+
+  <!-- ELENCO -->
+  <section id="view-list" class="view" hidden>
+    <header class="topbar">
+      <h1>FidUP!</h1>
+      <div class="actions">
+        <button class="icon-btn" data-action="lock" title="Blocca" aria-label="Blocca">🔒</button>
+        <button class="icon-btn" data-action="settings" title="Impostazioni" aria-label="Impostazioni">⚙️</button>
+      </div>
+    </header>
+    <div class="search-wrap"><input type="search" id="search" placeholder="Cerca…" autocomplete="off"></div>
+    <ul id="card-list" class="card-grid"></ul>
+    <p id="empty" class="muted center" hidden>Nessuna carta. Tocca <b>+</b> per aggiungerne una.</p>
+    <button class="fab" data-action="new" aria-label="Aggiungi carta">+</button>
+  </section>
+
+  <!-- DETTAGLIO -->
+  <section id="view-detail" class="view" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-action="back" aria-label="Indietro">‹</button>
+      <h1 id="detail-title"></h1>
+      <button class="icon-btn" data-action="edit" aria-label="Modifica">✏️</button>
+    </header>
+    <div class="detail">
+      <div id="detail-code" class="code-box"></div>
+      <div id="detail-number" class="number"></div>
+      <p id="detail-note" class="muted"></p>
+      <p class="muted small">Suggerimento: alza la luminosità dello schermo per facilitare la lettura alla cassa.</p>
+    </div>
+  </section>
+
+  <!-- MODIFICA -->
+  <section id="view-edit" class="view" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-action="cancel-edit" aria-label="Annulla">‹</button>
+      <h1 id="edit-title">Nuova carta</h1>
+      <span></span>
+    </header>
+    <form id="form-edit" class="form" autocomplete="off">
+      <div class="scan-row">
+        <button type="button" class="btn" data-action="scan">📷 Scansiona</button>
+        <label class="btn">🖼️ Da foto<input type="file" id="scan-photo" accept="image/*" hidden></label>
+      </div>
+      <label>Nome negozio<input id="f-name" required maxlength="60"></label>
+      <label>Numero / codice<input id="f-number" required maxlength="500" inputmode="text"></label>
+      <label>Formato codice
+        <select id="f-format">
+          <option value="CODE128">Code 128 (generico)</option>
+          <option value="EAN13">EAN-13</option>
+          <option value="EAN8">EAN-8</option>
+          <option value="UPC">UPC-A</option>
+          <option value="UPCE">UPC-E</option>
+          <option value="CODE39">Code 39</option>
+          <option value="ITF">ITF</option>
+          <option value="codabar">Codabar</option>
+          <option value="QR">QR Code</option>
+          <option value="NONE">Solo numero</option>
+        </select>
+      </label>
+      <label>Colore<input type="color" id="f-color" value="#1e3a5f"></label>
+      <label>Note<textarea id="f-note" rows="2" maxlength="300"></textarea></label>
+      <div id="edit-preview" class="code-box small-box"></div>
+      <button type="submit" class="btn primary">Salva</button>
+      <button type="button" class="btn danger" data-action="delete" id="btn-delete" hidden>Elimina carta</button>
+    </form>
+  </section>
+
+  <!-- IMPOSTAZIONI -->
+  <section id="view-settings" class="view" hidden>
+    <header class="topbar">
+      <button class="icon-btn" data-action="back" aria-label="Indietro">‹</button>
+      <h1>Impostazioni</h1>
+      <span></span>
+    </header>
+    <div class="form">
+      <h2>Backup cifrato</h2>
+      <p class="muted small">Il backup è lo stesso archivio cifrato con la tua password: chi lo trova nel cloud non può leggerlo.</p>
+      <button class="btn" data-action="backup-share">📤 Esporta backup (Condividi / Salva su File)</button>
+      <button class="btn" data-action="restore-file">📥 Importa backup da file</button>
+      <h3>Cloud diretto</h3>
+      <div class="two">
+        <button class="btn" data-action="cloud-backup" data-provider="google">⬆️ Google Drive</button>
+        <button class="btn" data-action="cloud-restore" data-provider="google">⬇️ Google Drive</button>
+        <button class="btn" data-action="cloud-backup" data-provider="microsoft">⬆️ OneDrive</button>
+        <button class="btn" data-action="cloud-restore" data-provider="microsoft">⬇️ OneDrive</button>
+      </div>
+      <p id="last-backup" class="muted small"></p>
+
+      <h2>Sicurezza</h2>
+      <label>Blocco automatico dopo
+        <select id="s-autolock">
+          <option value="0">Subito (all'uscita dall'app)</option>
+          <option value="1">1 minuto</option>
+          <option value="5">5 minuti</option>
+          <option value="15">15 minuti</option>
+          <option value="60">1 ora</option>
+        </select>
+      </label>
+      <button class="btn" data-action="change-pw">🔑 Cambia password</button>
+
+      <h2>Zona pericolosa</h2>
+      <button class="btn danger" data-action="wipe">Cancella tutti i dati da questo dispositivo</button>
+      <p class="muted small center" id="app-version"></p>
+    </div>
+  </section>
+
+  <!-- SCANNER -->
+  <div id="scanner" class="overlay" hidden>
+    <video id="scanner-video" playsinline muted></video>
+    <div class="scanner-frame"></div>
+    <p id="scanner-msg" class="scanner-msg">Inquadra il codice a barre</p>
+    <button class="btn" data-action="close-scan">Chiudi</button>
+  </div>
+
+  <!-- DIALOG GENERICO -->
+  <dialog id="dlg">
+    <form method="dialog" id="dlg-form">
+      <h3 id="dlg-title"></h3>
+      <p id="dlg-text"></p>
+      <div id="dlg-fields"></div>
+      <div class="dlg-actions">
+        <button value="cancel" class="btn" id="dlg-cancel">Annulla</button>
+        <button value="ok" class="btn primary" id="dlg-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <input type="file" id="restore-input" accept="application/json,.json,.cfbak" hidden>
+  <div id="toast" role="status" hidden></div>
+
+  <script src="vendor/JsBarcode.all.min.js"></script>
+  <script src="vendor/qrcode.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

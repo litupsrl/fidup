@@ -9,6 +9,14 @@ Web app installabile (PWA) che fa una sola cosa: conservare le carte fedeltà.
 - **Scansione**: fotocamera o foto. Su Android usa il `BarcodeDetector` nativo, su iPhone la libreria ZXing inclusa.
 - **Formati**: EAN-13, EAN-8, UPC-A/E, Code 128, Code 39, ITF, Codabar, QR, oppure solo numero.
 
+## Lingue
+
+FidUP! è disponibile in **italiano, inglese, francese, tedesco, spagnolo e cinese (semplificato)**.
+- La lingua viene scelta automaticamente da quella del telefono (inglese se non è tra quelle disponibili).
+- Si può cambiare in qualsiasi momento, senza reinstallare: dal selettore 🌐 nella pagina di benvenuto o in **Impostazioni → Lingua**. La scelta viene ricordata.
+- I testi sono in `i18n/<lingua>.js` (circa 12 KB ciascuno, 177 testi). L'italiano è la lingua di riferimento: un testo mancante in un'altra lingua viene mostrato in italiano.
+- Per aggiungere una lingua: copia `i18n/it.js`, traduci i valori, aggiungi il codice in `LANGS` (app.js), nei due selettori (index.html) e in `sw.js`.
+
 ## Suggerimento della catena
 
 Quando si aggiunge una carta, FidUP! suggerisce la catena **senza connessione e senza inviare dati**:

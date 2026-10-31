@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- FidUP! — Copyright LITUP S.r.l. · SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
      Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup) -->
-<html lang="it">
+<html lang="it" class="i18n-pending">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,63 +20,67 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- iPhone nel browser: invita a installare l'app tramite profilo (i dati del browser sono separati da quelli dell'app) -->
+  <!-- iPhone nel browser: solo istruzioni per installare l'app (i dati del browser sono separati da quelli dell'app) -->
   <section id="view-gate" class="view auth" hidden>
     <div class="auth-box">
+      <div class="gate-lang"><label class="lang-select" for="lang-gate"><span aria-hidden="true">🌐</span><select id="lang-gate" class="lang-picker" data-i18n-attr="aria-label:lang.label">
+          <option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option>
+          <option value="de">Deutsch</option><option value="es">Español</option><option value="zh">中文（简体）</option>
+        </select></label></div>
       <img src="icons/icon-192.png" alt="" class="logo">
       <h1>Fid<span class="up">UP!</span></h1>
-      <div class="slogan slogan-gate"><p class="slogan-text"><span class="hl">Nessuna registrazione</span>, <span class="hl">nessun dato in cloud</span><sup>*</sup>, <span class="hl">nessun tipo di profilazione</span>. Resta tutto sul tuo <span class="device-word">dispositivo</span>, <span class="hl">funziona anche offline!</span></p><p class="footnote">* Salvo i backup cifrati che scegli tu di salvare su Google Drive o OneDrive: nessuno, nemmeno Google o Microsoft, può leggerli.</p></div>
-      <p class="muted small">Su iPhone FidUP! si usa come app installata.</p>
+      <div class="slogan slogan-gate"><p class="slogan-text" data-i18n="slogan.text"></p><p class="footnote" data-i18n="slogan.note"></p></div>
+      <p class="muted small" data-i18n="gate.lead"></p>
 
       <!-- Istruzioni per installare: cambiano in base al browser e alla versione di iOS -->
       <div id="gate-safari-new" class="gate-steps" hidden>
-        <p class="gate-browser">Su <b>Safari</b>:</p>
+        <p class="gate-browser" data-i18n="gate.onSafari"></p>
         <ol class="steps left">
-          <li>Tocca <b>···</b> accanto alla barra dell'indirizzo</li>
-          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></li>
-          <li>Scorri in basso e tocca <b>Aggiungi alla schermata Home</b> (a volte è sotto <b>Altro</b>)<br><span class="muted small">Non la trovi? In fondo alla lista tocca <b>Modifica azioni</b> e aggiungi <b>Aggiungi alla schermata Home</b>.</span></li>
-          <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
-          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          <li data-i18n="gate.new1"></li>
+          <li data-i18n="gate.tapShare"></li>
+          <li><span data-i18n="gate.new3"></span><br><span class="muted small" data-i18n="gate.missing"></span></li>
+          <li data-i18n="gate.webapp"></li>
+          <li data-i18n="gate.open"></li>
         </ol>
       </div>
       <div id="gate-safari-old" class="gate-steps" hidden>
-        <p class="gate-browser">Su <b>Safari</b>:</p>
+        <p class="gate-browser" data-i18n="gate.onSafari"></p>
         <ol class="steps left">
-          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> nella barra in basso</li>
-          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b><br><span class="muted small">Non la trovi? In fondo alla lista tocca <b>Modifica azioni</b> e aggiungi <b>Aggiungi alla schermata Home</b>.</span></li>
-          <li>Tocca <b>Aggiungi</b></li>
-          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          <li data-i18n="gate.old1"></li>
+          <li><span data-i18n="gate.scrollAdd"></span><br><span class="muted small" data-i18n="gate.missing"></span></li>
+          <li data-i18n="gate.tapAdd"></li>
+          <li data-i18n="gate.open"></li>
         </ol>
       </div>
       <div id="gate-chrome" class="gate-steps" hidden>
-        <p class="gate-browser">Su <b>Chrome</b>:</p>
+        <p class="gate-browser" data-i18n="gate.onChrome"></p>
         <ol class="steps left">
-          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> nella barra dell'indirizzo, in alto a destra <span class="muted small">(oppure <b>···</b> → <b>Condividi</b>)</span></li>
-          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
-          <li>Tocca <b>Aggiungi</b></li>
-          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          <li data-i18n="gate.chrome1"></li>
+          <li data-i18n="gate.scrollAdd"></li>
+          <li data-i18n="gate.tapAdd"></li>
+          <li data-i18n="gate.open"></li>
         </ol>
       </div>
       <div id="gate-browser" class="gate-steps" hidden>
         <ol class="steps left">
-          <li>Apri il menu del browser e tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></li>
-          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
-          <li>Tocca <b>Aggiungi</b></li>
-          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          <li data-i18n="gate.browser1"></li>
+          <li data-i18n="gate.scrollAdd"></li>
+          <li data-i18n="gate.tapAdd"></li>
+          <li data-i18n="gate.open"></li>
         </ol>
-        <p class="muted small">Se non trovi la voce, apri questa pagina in <b>Safari</b> o <b>Chrome</b>.</p>
+        <p class="muted small" data-i18n="gate.browserNote"></p>
       </div>
       <div id="gate-inapp" class="gate-steps" hidden>
-        <p>Stai usando il browser interno di un'altra app: da qui non si può installare FidUP!.<br>Apri questa pagina in <b>Safari</b> o <b>Chrome</b>.</p>
-        <button class="btn" data-action="copy-link">📋 Copia link</button>
+        <p data-i18n="gate.inapp"></p>
+        <button class="btn" data-action="copy-link" data-i18n="btn.copyLink"></button>
       </div>
 
       <div id="gate-legacy" class="install" hidden>
-        <p class="small">Hai già <b id="gate-count"></b> salvate in questo browser. Prima di installare l'app esporta un backup, poi ripristinalo nell'app.</p>
-        <button class="btn" data-action="backup-share">📤 Esporta backup</button>
+        <p class="small" id="gate-legacy-text"></p>
+        <button class="btn" data-action="backup-share" data-i18n="btn.exportShort"></button>
       </div>
-      <p class="donate"><span>Se vuoi contribuire a rendere FidUP! migliore</span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer">❤️ Contribuisci con PayPal</a></p>
-      <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener">Licenza PolyForm Noncommercial 1.0.0</a><br>Uso libero solo per scopi non commerciali · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">Componenti di terze parti</a></p>
+      <p class="donate"><span data-i18n="donate.text"></span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer" data-i18n="donate.link"></a></p>
+      <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener" data-i18n="license.name"></a><br><span data-i18n="license.use"></span> · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener" data-i18n="license.third"></a></p>
     </div>
   </section>
 
@@ -85,13 +89,13 @@
     <div class="auth-box">
       <img src="icons/icon-192.png" alt="" class="logo">
       <h1>Fid<span class="up">UP!</span></h1>
-      <p class="muted">Da questa versione l'app si apre senza codice. Inserisci un'ultima volta la vecchia password per trasferire le carte: diventerà la tua password di backup.</p>
+      <p class="muted" data-i18n="lock.text"></p>
       <form id="form-unlock" autocomplete="off">
-        <input type="password" id="unlock-pw" placeholder="Vecchia password" required autocomplete="current-password">
-        <button type="submit" class="btn primary">Aggiorna</button>
+        <input type="password" id="unlock-pw" data-i18n-attr="placeholder:lock.placeholder" required autocomplete="current-password">
+        <button type="submit" class="btn primary" data-i18n="lock.update"></button>
       </form>
       <p id="unlock-error" class="error" hidden></p>
-      <button class="btn danger" data-action="migrate-reset">Non la ricordo: ricomincia da zero</button>
+      <button class="btn danger" data-action="migrate-reset" data-i18n="lock.reset"></button>
     </div>
   </section>
 
@@ -100,100 +104,100 @@
     <header class="topbar">
       <h1>Fid<span class="up">UP!</span></h1>
       <div class="actions">
-        <button class="icon-btn" data-action="settings" title="Impostazioni" aria-label="Impostazioni">⚙️</button>
+        <button class="icon-btn" data-action="settings" data-i18n-attr="title:nav.settings,aria-label:nav.settings">⚙️</button>
       </div>
     </header>
-    <div class="slogan slogan-list"><p class="slogan-text"><span class="hl">Nessuna registrazione</span>, <span class="hl">nessun dato in cloud</span><sup>*</sup>, <span class="hl">nessun tipo di profilazione</span>. Resta tutto sul tuo <span class="device-word">dispositivo</span>, <span class="hl">funziona anche offline!</span></p><p class="footnote">* Salvo i backup cifrati che scegli tu di salvare su Google Drive o OneDrive: nessuno, nemmeno Google o Microsoft, può leggerli.</p></div>
+    <div class="slogan slogan-list"><p class="slogan-text" data-i18n="slogan.text"></p><p class="footnote" data-i18n="slogan.note"></p></div>
     <div id="install-banner" class="install" hidden>
       <div class="install-head">
         <img src="icons/icon-192.png" alt="" class="install-icon">
-        <div><b>Installa FidUP! come app sul tuo <span class="device-word">dispositivo</span></b><br><span class="muted small">Si apre con un tocco e funziona anche senza internet.</span></div>
+        <div><b data-i18n="install.title"></b><br><span class="muted small" data-i18n="install.sub"></span></div>
       </div>
       <div id="install-prompt" hidden>
-        <button class="btn primary" data-action="install">📲 Installa</button>
+        <button class="btn primary" data-action="install"></button>
       </div>
       <div id="install-android" hidden>
-        <ol class="steps"><li>Tocca il menu <b>⋮</b> in alto a destra</li><li>Tocca <b>Installa app</b> (o <b>Aggiungi a schermata Home</b>)</li></ol>
+        <ol class="steps" data-i18n="install.android"></ol>
       </div>
       <div id="install-ios" hidden>
         <ol class="steps">
-          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> <span class="muted small">(se non lo vedi, prima tocca <b>···</b>)</span></li>
-          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
-          <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
+          <li data-i18n="install.ios1"></li>
+          <li data-i18n="gate.scrollAdd"></li>
+          <li data-i18n="gate.webapp"></li>
         </ol>
       </div>
       <div id="install-desktop" class="install-qr" hidden>
-        <img src="qr/fidup-qr.png" alt="QR code per installare FidUP!" width="180" height="180">
+        <img src="qr/fidup-qr.png" data-i18n-attr="alt:install.qrAlt" width="180" height="180">
         <div>
-          <b>📱 Installa FidUP! sul tuo smartphone</b>
-          <p class="small muted">Inquadra il QR code con la fotocamera del telefono e segui le istruzioni.</p>
+          <b data-i18n="install.desktopTitle"></b>
+          <p class="small muted" data-i18n="install.desktopText"></p>
         </div>
       </div>
       <div id="install-inapp" hidden>
-        <p class="small">Stai usando il browser interno di un'altra app. Apri questa pagina in <b>Safari</b> (iPhone) o <b>Chrome</b> (Android) per installarla.</p>
-        <button class="btn" data-action="copy-link">📋 Copia link</button>
+        <p class="small" data-i18n="install.inapp"></p>
+        <button class="btn" data-action="copy-link" data-i18n="btn.copyLink"></button>
       </div>
-      <button class="link-btn" data-action="install-dismiss">Non ora</button>
+      <button class="link-btn" data-action="install-dismiss" data-i18n="install.notNow"></button>
     </div>
     <div class="search-wrap">
-      <input type="search" id="search" placeholder="Cerca…" autocomplete="off">
-      <select id="sort" aria-label="Ordina le carte">
-        <option value="uses">Più usate</option>
-        <option value="recent">Recenti</option>
-        <option value="az">A-Z</option>
+      <input type="search" id="search" data-i18n-attr="placeholder:list.search" autocomplete="off">
+      <select id="sort" data-i18n-attr="aria-label:list.sortAria">
+        <option value="uses" data-i18n="list.sortUses"></option>
+        <option value="recent" data-i18n="list.sortRecent"></option>
+        <option value="az" data-i18n="list.sortAz"></option>
       </select>
     </div>
     <ul id="card-list" class="card-grid"></ul>
     <div id="empty" class="form center" hidden>
-      <p class="muted">Nessuna carta. Tocca <b>+</b> per aggiungerne una.</p>
-      <p class="muted small">Hai già un backup?</p>
-      <button class="btn" data-action="restore-file">📥 Ripristina da file</button>
-      <button class="btn" data-action="cloud-restore" data-provider="google">⬇️ Ripristina da Google Drive</button>
-      <button class="btn" data-action="cloud-restore" data-provider="microsoft">⬇️ Ripristina da OneDrive</button>
+      <p class="muted" data-i18n="list.empty"></p>
+      <p class="muted small" data-i18n="list.haveBackup"></p>
+      <button class="btn" data-action="restore-file" data-i18n="btn.restoreFile"></button>
+      <button class="btn" data-action="cloud-restore" data-provider="google" data-i18n="btn.restoreGoogle"></button>
+      <button class="btn" data-action="cloud-restore" data-provider="microsoft" data-i18n="btn.restoreOneDrive"></button>
     </div>
-    <p class="donate"><span>Se vuoi contribuire a rendere FidUP! migliore</span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer">❤️ Contribuisci con PayPal</a></p>
-    <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener">Licenza PolyForm Noncommercial 1.0.0</a><br>Uso libero solo per scopi non commerciali · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">Componenti di terze parti</a></p>
-    <button class="fab" data-action="new" aria-label="Aggiungi carta">+</button>
+    <p class="donate"><span data-i18n="donate.text"></span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer" data-i18n="donate.link"></a></p>
+    <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener" data-i18n="license.name"></a><br><span data-i18n="license.use"></span> · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener" data-i18n="license.third"></a></p>
+    <button class="fab" data-action="new" data-i18n-attr="aria-label:list.add">+</button>
   </section>
 
   <!-- DETTAGLIO -->
   <section id="view-detail" class="view" hidden>
     <header class="topbar">
-      <button class="icon-btn" data-action="back" aria-label="Indietro">‹</button>
+      <button class="icon-btn" data-action="back" data-i18n-attr="aria-label:nav.back">‹</button>
       <h1 id="detail-title"></h1>
-      <button class="icon-btn" data-action="edit" aria-label="Modifica">✏️</button>
+      <button class="icon-btn" data-action="edit" data-i18n-attr="aria-label:nav.edit">✏️</button>
     </header>
     <div class="detail">
       <div id="detail-code" class="code-box"></div>
       <div id="detail-number" class="number"></div>
       <p id="detail-note" class="muted"></p>
-      <p class="muted small">Suggerimento: alza la luminosità dello schermo per facilitare la lettura alla cassa.</p>
+      <p class="muted small" data-i18n="detail.tip"></p>
     </div>
   </section>
 
   <!-- MODIFICA -->
   <section id="view-edit" class="view" hidden>
     <header class="topbar">
-      <button class="icon-btn" data-action="cancel-edit" aria-label="Annulla">‹</button>
-      <h1 id="edit-title">Nuova carta</h1>
+      <button class="icon-btn" data-action="cancel-edit" data-i18n-attr="aria-label:nav.cancel">‹</button>
+      <h1 id="edit-title"></h1>
       <span></span>
     </header>
     <form id="form-edit" class="form" autocomplete="off">
       <div class="scan-row">
-        <button type="button" class="btn" data-action="scan">📷 Scansiona</button>
-        <label class="btn">🖼️ Da foto<input type="file" id="scan-photo" accept="image/*" hidden></label>
+        <button type="button" class="btn" data-action="scan" data-i18n="edit.scan"></button>
+        <label class="btn"><span data-i18n="edit.photo"></span><input type="file" id="scan-photo" accept="image/*" hidden></label>
       </div>
       <p id="ocr-status" class="ocr-status" hidden></p>
       <div id="chain-hint" class="chain-hint" hidden>
-        <span>💡 Sembra una carta <b id="chain-hint-name"></b></span>
-        <button type="button" class="btn primary" data-action="chain-use">Usa</button>
+        <span><span data-i18n="edit.looks"></span> <b id="chain-hint-name"></b></span>
+        <button type="button" class="btn primary" data-action="chain-use" data-i18n="edit.use"></button>
       </div>
-      <label>Nome negozio<input id="f-name" required maxlength="60" autocomplete="off" placeholder="Es. Esselunga, Coop, IKEA…"></label>
+      <label><span data-i18n="edit.name"></span><input id="f-name" required maxlength="60" autocomplete="off" data-i18n-attr="placeholder:edit.namePh"></label>
       <div id="name-suggest" class="name-suggest" hidden></div>
-      <label>Numero / codice<input id="f-number" required maxlength="500" inputmode="text"></label>
-      <label>Formato codice
+      <label><span data-i18n="edit.number"></span><input id="f-number" required maxlength="500" inputmode="text"></label>
+      <label><span data-i18n="edit.format"></span>
         <select id="f-format">
-          <option value="CODE128">Code 128 (generico)</option>
+          <option value="CODE128" data-i18n="edit.code128"></option>
           <option value="EAN13">EAN-13</option>
           <option value="EAN8">EAN-8</option>
           <option value="UPC">UPC-A</option>
@@ -202,31 +206,37 @@
           <option value="ITF">ITF</option>
           <option value="codabar">Codabar</option>
           <option value="QR">QR Code</option>
-          <option value="NONE">Solo numero</option>
+          <option value="NONE" data-i18n="edit.numberOnly"></option>
         </select>
       </label>
-      <label>Colore<input type="color" id="f-color" value="#3A3A3A"></label>
-      <label>Note<textarea id="f-note" rows="2" maxlength="300"></textarea></label>
+      <label><span data-i18n="edit.color"></span><input type="color" id="f-color" value="#3A3A3A"></label>
+      <label><span data-i18n="edit.note"></span><textarea id="f-note" rows="2" maxlength="300"></textarea></label>
       <div id="edit-preview" class="code-box small-box"></div>
-      <button type="submit" class="btn primary">Salva</button>
-      <button type="button" class="btn danger" data-action="delete" id="btn-delete" hidden>Elimina carta</button>
+      <button type="submit" class="btn primary" data-i18n="edit.save"></button>
+      <button type="button" class="btn danger" data-action="delete" id="btn-delete" hidden data-i18n="edit.delete"></button>
     </form>
   </section>
 
   <!-- IMPOSTAZIONI -->
   <section id="view-settings" class="view" hidden>
     <header class="topbar">
-      <button class="icon-btn" data-action="back" aria-label="Indietro">‹</button>
-      <h1>Impostazioni</h1>
+      <button class="icon-btn" data-action="back" data-i18n-attr="aria-label:nav.back">‹</button>
+      <h1 data-i18n="nav.settings"></h1>
       <span></span>
     </header>
     <div class="form">
-      <h2>Backup cifrato</h2>
-      <p class="muted small">Il backup è cifrato con la tua password di backup: chi lo trova nel cloud non può leggerlo.</p>
-      <button class="btn" data-action="backup-share">📤 Esporta backup (Google Drive, OneDrive, File…)</button>
-      <button class="btn" data-action="restore-file">📥 Importa backup da file</button>
+      <h2 data-i18n="lang.label"></h2>
+      <div class="settings-lang"><label class="lang-select" for="lang-settings"><span aria-hidden="true">🌐</span><select id="lang-settings" class="lang-picker" data-i18n-attr="aria-label:lang.label">
+          <option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option>
+          <option value="de">Deutsch</option><option value="es">Español</option><option value="zh">中文（简体）</option>
+        </select></label></div>
+
+      <h2 data-i18n="settings.backupTitle"></h2>
+      <p class="muted small" data-i18n="settings.backupText"></p>
+      <button class="btn" data-action="backup-share" data-i18n="settings.export"></button>
+      <button class="btn" data-action="restore-file" data-i18n="settings.import"></button>
       <div id="cloud-direct" hidden>
-      <h3>Cloud diretto</h3>
+      <h3 data-i18n="settings.cloudDirect"></h3>
       <div class="two">
         <button class="btn" data-action="cloud-backup" data-provider="google">⬆️ Google Drive</button>
         <button class="btn" data-action="cloud-restore" data-provider="google">⬇️ Google Drive</button>
@@ -236,20 +246,20 @@
       </div>
       <p id="last-backup" class="muted small"></p>
 
-      <h2>Password di backup</h2>
-      <p class="muted small">L'app si apre senza codice: le carte sono cifrate con una chiave che resta solo su questo telefono. La password di backup serve unicamente per ripristinare i backup su un altro dispositivo.</p>
-      <button class="btn" data-action="backup-pw" id="btn-backup-pw">🔑 Imposta password di backup</button>
+      <h2 data-i18n="settings.pwTitle"></h2>
+      <p class="muted small" data-i18n="settings.pwText"></p>
+      <button class="btn" data-action="backup-pw" id="btn-backup-pw"></button>
 
       <div id="settings-install" hidden>
-        <h2>Installazione</h2>
-        <button class="btn" data-action="install-show">📲 Installa come app</button>
+        <h2 data-i18n="settings.installTitle"></h2>
+        <button class="btn" data-action="install-show" data-i18n="settings.installBtn"></button>
       </div>
 
-      <h2>Zona pericolosa</h2>
-      <button class="btn danger" data-action="wipe">Cancella tutti i dati da questo dispositivo</button>
-      <p class="donate"><span>Se vuoi contribuire a rendere FidUP! migliore</span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer">❤️ Contribuisci con PayPal</a></p>
+      <h2 data-i18n="settings.danger"></h2>
+      <button class="btn danger" data-action="wipe" data-i18n="settings.wipe"></button>
+      <p class="donate"><span data-i18n="donate.text"></span> <a href="https://www.paypal.com/pool/9tZ4rt5HCO?sr=wccr" target="_blank" rel="noopener noreferrer" data-i18n="donate.link"></a></p>
       <p class="muted small center" id="app-version"></p>
-      <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener">Licenza PolyForm Noncommercial 1.0.0</a><br>Uso libero solo per scopi non commerciali · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">Componenti di terze parti</a></p>
+      <p class="license-note">© LITUP S.r.l. · <a href="LICENSE.md" target="_blank" rel="noopener" data-i18n="license.name"></a><br><span data-i18n="license.use"></span> · <a href="THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener" data-i18n="license.third"></a></p>
     </div>
   </section>
 
@@ -257,8 +267,8 @@
   <div id="scanner" class="overlay" hidden>
     <video id="scanner-video" playsinline muted></video>
     <div class="scanner-frame"></div>
-    <p id="scanner-msg" class="scanner-msg">Inquadra il codice a barre</p>
-    <button class="btn" data-action="close-scan">Chiudi</button>
+    <p id="scanner-msg" class="scanner-msg" data-i18n="scanner.msg"></p>
+    <button class="btn" data-action="close-scan" data-i18n="btn.close"></button>
   </div>
 
   <!-- DIALOG GENERICO -->
@@ -268,20 +278,21 @@
       <p id="dlg-text"></p>
       <div id="dlg-fields"></div>
       <div class="dlg-actions">
-        <button value="cancel" class="btn" id="dlg-cancel">Annulla</button>
-        <button value="ok" class="btn primary" id="dlg-ok">OK</button>
+        <button value="cancel" class="btn" id="dlg-cancel"></button>
+        <button value="ok" class="btn primary" id="dlg-ok"></button>
       </div>
     </form>
   </dialog>
 
   <input type="file" id="restore-input" accept="application/json,.json,.cfbak" hidden>
   <div id="toast" role="status" hidden></div>
-  <div id="version-footer" aria-label="Versione dell'app"></div>
+  <div id="version-footer" data-i18n-attr="aria-label:version.aria"></div>
 
   <script src="vendor/JsBarcode.all.min.js"></script>
   <script src="vendor/qrcode.js"></script>
   <script src="config.js"></script>
   <script src="chains.js"></script>
+  <script src="i18n/it.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

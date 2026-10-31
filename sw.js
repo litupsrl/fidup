@@ -3,9 +3,9 @@
  * Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)
  * https://polyformproject.org/licenses/noncommercial/1.0.0 */
 // Service worker: rende l'app utilizzabile offline. Non vede né salva dati delle carte.
-const CACHE = 'fidup-v1.13.0';
+const CACHE = 'fidup-v2.0.0';
 const ASSETS = [
-  './', 'index.html', 'styles.css', 'app.js', 'config.js', 'chains.js', 'manifest.webmanifest',
+  './', 'index.html', 'styles.css', 'app.js', 'config.js', 'chains.js', 'i18n/it.js', 'i18n/en.js', 'i18n/fr.js', 'i18n/de.js', 'i18n/es.js', 'i18n/zh.js', 'manifest.webmanifest',
   'vendor/JsBarcode.all.min.js', 'vendor/qrcode.js', 'vendor/zxing.min.js',
   'favicon.ico', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'
 ];

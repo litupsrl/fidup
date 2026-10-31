@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.13.0';
+const APP_VERSION = '2.0.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -25,7 +25,7 @@ function b64url(buf) { return b64(buf).replace(/\+/g, '-').replace(/\//g, '_').r
 function rnd(n) { return crypto.getRandomValues(new Uint8Array(n)); }
 function uid() { return b64url(rnd(12)); }
 function today() { return new Date().toISOString().slice(0, 10); }
-function fmtDate(iso) { try { return new Date(iso).toLocaleString('it-IT', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return iso; } }
+function fmtDate(iso) { try { return new Date(iso).toLocaleString(LOCALES[LANG], { dateStyle: 'medium', timeStyle: 'short' }); } catch { return iso; } }
 
 let toastTimer;
 function toast(msg, ms = 2800) {
@@ -33,6 +33,54 @@ function toast(msg, ms = 2800) {
   t.textContent = msg; t.hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms);
 }
+
+
+/* ---------- Lingue ---------- */
+const LANGS = ['it', 'en', 'fr', 'de', 'es', 'zh'];
+const LOCALES = { it: 'it-IT', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', zh: 'zh-CN' };
+const SHARE_SVG = '<svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+function detectLang() {
+  const saved = localStorage.getItem('lang');
+  if (LANGS.includes(saved)) return saved;
+  for (const l of navigator.languages || [navigator.language || '']) { const p = String(l).slice(0, 2).toLowerCase(); if (LANGS.includes(p)) return p; }
+  return 'en';
+}
+let LANG = detectLang();
+setTimeout(() => document.documentElement.classList.remove('i18n-pending'), 3000); // sicurezza: mai pagina invisibile
+/** Testo tradotto; ricade sull'italiano se manca. {chiave} viene sostituita con i valori passati. */
+function t(key, vars = {}) {
+  const D = window.I18N || {};
+  let s = (D[LANG] && D[LANG][key]) ?? (D.it && D.it[key]) ?? key;
+  if (vars.n != null && vars.cards == null) vars.cards = cardsLabel(vars.n);
+  return s.replace(/\{(\w+)\}/g, (m, k) => (k === 'share' ? SHARE_SVG : vars[k] != null ? vars[k] : m));
+}
+function cardsLabel(n) { return n === 1 ? t('cards.one') : t('cards.many', { n, cards: '' }).replace(/\s+$/, ''); }
+function loadLang(l) {
+  if (l === 'it' || (window.I18N && window.I18N[l])) return Promise.resolve();
+  return new Promise((res) => { const s = document.createElement('script'); s.src = 'i18n/' + l + '.js'; s.onload = res; s.onerror = res; document.head.append(s); });
+}
+/** Applica i testi a tutti gli elementi con data-i18n / data-i18n-attr. */
+function applyI18n() {
+  document.documentElement.lang = LANG === 'zh' ? 'zh-Hans' : LANG;
+  document.querySelectorAll('[data-i18n]').forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-attr]').forEach((el) => {
+    el.dataset.i18nAttr.split(',').forEach((pair) => { const [attr, key] = pair.split(':'); el.setAttribute(attr, t(key)); });
+  });
+  document.querySelectorAll('.lang-picker').forEach((s) => { s.value = LANG; });
+  if (typeof deviceWord === 'function') deviceWord();
+  document.documentElement.classList.remove('i18n-pending');
+}
+async function setLang(l) {
+  if (!LANGS.includes(l)) return;
+  LANG = l; localStorage.setItem('lang', l);
+  await loadLang(l);
+  applyI18n();
+  // aggiorna le parti generate dal codice
+  if (!$('#view-gate').hidden) showGate();
+  else if (S.data) { const v = (history.state && history.state.view) || 'list'; renderView(v === 'lock' ? 'list' : v); }
+  if (typeof Install !== 'undefined') Install.render();
+}
+document.addEventListener('change', (e) => { if (e.target.classList && e.target.classList.contains('lang-picker')) setLang(e.target.value); });
 
 /* ---------- IndexedDB (solo dati cifrati) ---------- */
 const DB = {
@@ -92,9 +140,9 @@ async function getDeviceKey() {
 }
 
 function validateBackup(v) {
-  if (!v || v.app !== 'fidup' || ![1, 2].includes(v.version) || !v.kdf || !v.iv || !v.ct) throw new Error('File di backup non valido');
+  if (!v || v.app !== 'fidup' || ![1, 2].includes(v.version) || !v.kdf || !v.iv || !v.ct) throw new Error(t('err.backupInvalid'));
   const it = v.kdf.iterations;
-  if (!Number.isInteger(it) || it < 100000 || it > 10000000) throw new Error('Parametri di cifratura non validi');
+  if (!Number.isInteger(it) || it < 100000 || it > 10000000) throw new Error(t('err.kdf'));
   return v;
 }
 
@@ -105,7 +153,7 @@ async function openBackup(b, password) {
   try {
     const data = await Crypto.decrypt(key, b.iv, b.ct);
     return { key, data: normalizeData(data) };
-  } catch { throw new Error('Password errata'); }
+  } catch { throw new Error(t('err.wrongPw')); }
 }
 
 function normalizeData(d) {
@@ -139,20 +187,20 @@ async function setBackupPassword(password) {
 async function askNewBackupPassword(title) {
   const r = await ask({
     title,
-    text: 'Serve a cifrare i backup nel cloud. Ti verrà chiesta SOLO per ripristinare su un altro telefono: annotala in un posto sicuro, senza di essa il backup è illeggibile.',
-    fields: [{ id: 'p1', type: 'password', placeholder: 'Password di backup (min. 8)' }, { id: 'p2', type: 'password', placeholder: 'Ripeti password' }],
-    ok: 'Salva'
+    text: t('bpw.text'),
+    fields: [{ id: 'p1', type: 'password', placeholder: t('bpw.ph1') }, { id: 'p2', type: 'password', placeholder: t('bpw.ph2') }],
+    ok: t('bpw.save')
   });
   if (!r) return false;
-  if (r.p1.length < 8) { toast('Almeno 8 caratteri'); return false; }
-  if (r.p1 !== r.p2) { toast('Le password non coincidono'); return false; }
+  if (r.p1.length < 8) { toast(t('bpw.min8')); return false; }
+  if (r.p1 !== r.p2) { toast(t('bpw.mismatch')); return false; }
   await setBackupPassword(r.p1);
   return true;
 }
 async function makeBackup() {
   let bk = await DB.get('backupkey');
   if (!bk) {
-    if (!(await askNewBackupPassword('Scegli la password di backup'))) return null;
+    if (!(await askNewBackupPassword(t('bpw.chooseTitle')))) return null;
     bk = await DB.get('backupkey');
   }
   const { iv, ct } = await Crypto.encrypt(bk.key, S.data);
@@ -189,7 +237,7 @@ window.addEventListener('popstate', (e) => {
 /* Ordine dell'elenco: 'uses' = più usate (predefinito), 'recent' = usate di recente, 'az' = alfabetico */
 function sortedCards() {
   const mode = S.data.meta.sort || 'uses';
-  const byName = (a, b) => a.name.localeCompare(b.name, 'it', { sensitivity: 'base' });
+  const byName = (a, b) => a.name.localeCompare(b.name, LANG, { sensitivity: 'base' });
   const byRecent = (a, b) => (b.lastUsed || b.createdAt || '').localeCompare(a.lastUsed || a.createdAt || '');
   const byUses = (a, b) => (b.uses || 0) - (a.uses || 0);
   const cmp = mode === 'az' ? [byName] : mode === 'recent' ? [byRecent, byName] : [byUses, byRecent, byName];
@@ -230,7 +278,7 @@ function renderCode(box, number, format, large) {
   box.replaceChildren();
   box.classList.remove('qr');
   if (!number) return;
-  if (format === 'NONE') { if (!large) return; const p = document.createElement('p'); p.textContent = 'Solo numero (nessun codice grafico)'; p.className = 'muted'; box.append(p); return; }
+  if (format === 'NONE') { if (!large) return; const p = document.createElement('p'); p.textContent = t('code.onlyNumber'); p.className = 'muted'; box.append(p); return; }
   try {
     if (format === 'QR') {
       const qr = qrcode(0, 'M'); qr.addData(unescape(encodeURIComponent(number)), 'Byte'); qr.make();
@@ -246,7 +294,7 @@ function renderCode(box, number, format, large) {
     box.append(svg);
   } catch {
     const p = document.createElement('p'); p.className = 'error';
-    p.textContent = 'Il numero non è valido per il formato ' + format + '. Prova "Code 128".';
+    p.textContent = t('code.invalid', { format });
     box.append(p);
   }
 }
@@ -264,7 +312,7 @@ function renderDetail() {
 /* ---------- Modifica ---------- */
 function renderEdit() {
   const c = S.editingId ? S.data.cards.find((x) => x.id === S.editingId) : null;
-  $('#edit-title').textContent = c ? 'Modifica carta' : 'Nuova carta';
+  $('#edit-title').textContent = c ? t('edit.edit') : t('edit.new');
   $('#f-name').value = c ? c.name : '';
   $('#f-number').value = c ? c.number : '';
   $('#f-format').value = c ? c.format : 'CODE128';
@@ -382,12 +430,12 @@ $('#form-edit').addEventListener('submit', async (e) => {
     S.data.cards.push(Object.assign({ id: uid(), createdAt: now }, fields));
   }
   await persist();
-  toast('Carta salvata');
+  toast(t('toast.cardSaved'));
   history.back();
 });
 
 /* ---------- Dialog ---------- */
-function ask({ title, text = '', fields = [], ok = 'OK', cancel = 'Annulla', danger = false }) {
+function ask({ title, text = '', fields = [], ok = t('dlg.ok'), cancel = t('dlg.cancel'), danger = false }) {
   const dlg = $('#dlg');
   $('#dlg-title').textContent = title;
   $('#dlg-text').textContent = text;
@@ -444,16 +492,16 @@ function onScanResult(text, rawFormat) {
   $('#f-number').value = text.trim();
   const f = normFormat(rawFormat);
   if (f) $('#f-format').value = f;
-  else { $('#f-format').value = /^\d+$/.test(text) ? 'CODE128' : 'QR'; toast('Formato ' + rawFormat + ' non riproducibile: scelto un formato alternativo, verificalo.', 5000); }
+  else { $('#f-format').value = /^\d+$/.test(text) ? 'CODE128' : 'QR'; toast(t('scan.altFormat', { format: rawFormat }), 5000); }
   updatePreview();
   updateChainHint();
   if (navigator.vibrate) navigator.vibrate(60);
-  toast(chainSuggestion ? 'Codice letto ✔ Sembra una carta ' + chainSuggestion.name : 'Codice letto ✔');
+  toast(chainSuggestion ? t('scan.readChain', { name: chainSuggestion.name }) : t('scan.read'));
 }
 
 async function startScanner() {
   $('#scanner').hidden = false;
-  $('#scanner-msg').textContent = 'Inquadra il codice a barre';
+  $('#scanner-msg').textContent = t('scanner.msg');
   const video = $('#scanner-video');
   try {
     const det = await nativeDetector();
@@ -481,7 +529,7 @@ async function startScanner() {
     }
   } catch (err) {
     stopScanner();
-    toast('Fotocamera non disponibile: ' + (err && err.name === 'NotAllowedError' ? 'permesso negato' : (err.message || err)), 5000);
+    toast(t('cam.unavailable', { reason: err && err.name === 'NotAllowedError' ? t('cam.denied') : (err.message || err) }), 5000);
   }
 }
 function stopScanner() {
@@ -506,7 +554,7 @@ function grabFrame(src, max = 1600) {
 }
 async function scanFromPhoto(file) {
   let cv;
-  try { cv = grabFrame(await createImageBitmap(file)); } catch { return toast('Impossibile leggere la foto'); }
+  try { cv = grabFrame(await createImageBitmap(file)); } catch { return toast(t('photo.cantRead')); }
   let found = false;
   try {
     const det = await nativeDetector();
@@ -522,7 +570,7 @@ async function scanFromPhoto(file) {
       } catch {}
     }
   } catch {}
-  if (!found) toast('Nessun codice trovato nella foto: cerco almeno il nome', 4000);
+  if (!found) toast(t('photo.noCode'), 4000);
   readBrandFrom(cv);
 }
 
@@ -593,7 +641,7 @@ async function readBrandFrom(canvas) {
   if (!canvas) return;
   const run = ++ocrRun;
   const firstTime = !ocrWorker;
-  ocrStatus('🔎 Cerco il nome del negozio nella foto…' + (firstTime ? ' (la prima volta può richiedere qualche secondo)' : ''));
+  ocrStatus(t('ocr.searching') + (firstTime ? t('ocr.first') : ''));
   try {
     const w = await getOcr();
     let match = null, guess = null;
@@ -607,14 +655,14 @@ async function readBrandFrom(canvas) {
     if ($('#view-edit').hidden) return;
     ocrStatus('');
     const nameEmpty = !$('#f-name').value.trim();
-    if (match && nameEmpty) { applyChain(match); toast('Nome trovato nella foto: ' + match.name, 3500); return; }
+    if (match && nameEmpty) { applyChain(match); toast(t('ocr.found', { name: match.name }), 3500); return; }
     const sug = match || (guess ? { name: guess, color: null, why: 'foto' } : null);
     if (sug && norm(sug.name) !== norm($('#f-name').value)) {
       chainSuggestion = sug; $('#chain-hint-name').textContent = sug.name; $('#chain-hint').hidden = false;
-    } else if (!sug) toast('Nome del negozio non riconosciuto: scrivilo tu', 3500);
+    } else if (!sug) toast(t('ocr.notFound'), 3500);
   } catch (e) {
     if (run === ocrRun) ocrStatus('');
-    if (!navigator.onLine && firstTime) toast('La lettura del nome richiede internet la prima volta', 4000);
+    if (!navigator.onLine && firstTime) toast(t('ocr.needNet'), 4000);
   }
 }
 $('#scan-photo').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) scanFromPhoto(f); });
@@ -622,9 +670,9 @@ $('#scan-photo').addEventListener('change', (e) => { const f = e.target.files[0]
 /* ---------- Impostazioni ---------- */
 async function renderSettings() {
   const lb = S.data.meta.lastBackup;
-  $('#last-backup').textContent = lb ? `Ultimo backup: ${fmtDate(lb.date)} (${lb.where})` : 'Nessun backup ancora eseguito.';
-  $('#app-version').textContent = 'Versione ' + APP_VERSION + ' · ' + S.data.cards.length + ' carte';
-  $('#btn-backup-pw').textContent = (await DB.get('backupkey')) ? '🔑 Cambia password di backup' : '🔑 Imposta password di backup';
+  $('#last-backup').textContent = lb ? t('settings.lastBackup', { date: fmtDate(lb.date), where: lb.where === 'file' ? t('restore.file') : lb.where }) : t('settings.noBackup');
+  $('#app-version').textContent = t('settings.version', { v: APP_VERSION, n: S.data.cards.length });
+  $('#btn-backup-pw').textContent = (await DB.get('backupkey')) ? t('settings.pwChange') : t('settings.pwSet');
 }
 
 async function markBackup(where) {
@@ -641,16 +689,16 @@ async function backupShare() {
   const file = new File([JSON.stringify(backup)], name, { type: 'application/json' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Backup FidUP!' });
-      toast('Backup condiviso');
+      await navigator.share({ files: [file], title: t('share.title') });
+      toast(t('toast.shared'));
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(file); a.download = name; document.body.append(a); a.click();
       setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      toast('Backup scaricato');
+      toast(t('toast.downloaded'));
     }
     await markBackup('file');
-  } catch (e) { if (e.name !== 'AbortError') toast('Errore: ' + e.message); }
+  } catch (e) { if (e.name !== 'AbortError') toast(t('err.generic', { msg: e.message })); }
 }
 
 function pickRestoreFile() {
@@ -658,15 +706,15 @@ function pickRestoreFile() {
 }
 $('#restore-input').addEventListener('change', async (e) => {
   const f = e.target.files[0]; if (!f) return;
-  if (f.size > 20 * 1024 * 1024) return toast('File troppo grande');
+  if (f.size > 20 * 1024 * 1024) return toast(t('file.tooBig'));
   try { await restoreFromBackup(JSON.parse(await f.text()), 'file'); }
-  catch (err) { toast(err.message || 'File non valido', 4000); }
+  catch (err) { toast(err instanceof SyntaxError ? t('file.invalid') : (err.message || t('file.invalid')), 4000); }
 });
 
 /** Ripristino comune (file o cloud). */
 async function restoreFromBackup(backup, source) {
   validateBackup(backup);
-  const r = await ask({ title: 'Password di backup', text: 'Inserisci la password con cui è stato creato il backup.', fields: [{ id: 'pw', type: 'password', placeholder: 'Password' }], ok: 'Decifra' });
+  const r = await ask({ title: t('restore.pwTitle'), text: t('restore.pwText'), fields: [{ id: 'pw', type: 'password', placeholder: t('restore.pwPh') }], ok: t('restore.decrypt') });
   if (!r) return;
   let opened;
   try { opened = await openBackup(backup, r.pw); } catch (e) { toast(e.message, 4000); return; }
@@ -675,9 +723,9 @@ async function restoreFromBackup(backup, source) {
     S.data.cards = opened.data.cards;
   } else {
     const choice = await ask({
-      title: `Backup con ${opened.data.cards.length} carte`,
-      text: 'Unisci: aggiunge le carte del backup a quelle attuali (tiene la versione più recente). Sostituisci: elimina le carte attuali.',
-      ok: 'Unisci', cancel: 'Altre opzioni'
+      title: t('restore.withCards', { n: opened.data.cards.length }),
+      text: t('restore.mergeText'),
+      ok: t('restore.merge'), cancel: t('restore.more')
     });
     if (choice) {
       const map = new Map(S.data.cards.map((c) => [c.id, c]));
@@ -687,7 +735,7 @@ async function restoreFromBackup(backup, source) {
       }
       S.data.cards = [...map.values()];
     } else {
-      const rep = await ask({ title: 'Sostituire tutte le carte?', text: 'Le carte attuali verranno eliminate e sostituite da quelle del backup.', ok: 'Sostituisci', danger: true });
+      const rep = await ask({ title: t('restore.replaceTitle'), text: t('restore.replaceText'), ok: t('restore.replace'), danger: true });
       if (!rep) return;
       S.data.cards = opened.data.cards;
     }
@@ -695,7 +743,7 @@ async function restoreFromBackup(backup, source) {
   // se su questo telefono non c'è ancora una password di backup, usa quella appena inserita
   if (!(await DB.get('backupkey'))) await DB.set('backupkey', { key: opened.key, salt: backup.kdf.salt, iterations: backup.kdf.iterations });
   await persist();
-  toast(`Ripristino completato: ${S.data.cards.length} carte (${source})`);
+  toast(t('restore.done', { n: S.data.cards.length, source: source === 'file' ? t('restore.file') : source }));
   history.replaceState({ view: 'list' }, ''); renderView('list');
 }
 
@@ -716,8 +764,8 @@ const Cloud = {
     },
     async api(token, url, opts = {}) {
       const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + token }, opts.headers || {}) }));
-      if (r.status === 401) { clearToken('google'); throw new Error('Sessione Google scaduta, riprova'); }
-      if (!r.ok) throw new Error('Google Drive: errore ' + r.status);
+      if (r.status === 401) { clearToken('google'); throw new Error(t('cloud.expired', { p: 'Google' })); }
+      if (!r.ok) throw new Error(t('cloud.error', { p: 'Google Drive', status: r.status }));
       return r;
     },
     async find(token) {
@@ -738,7 +786,7 @@ const Cloud = {
     },
     async download(token) {
       const f = await this.find(token);
-      if (!f) throw new Error('Nessun backup trovato su Google Drive');
+      if (!f) throw new Error(t('cloud.noBackup', { p: 'Google Drive' }));
       return (await this.api(token, `https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).json();
     }
   },
@@ -765,15 +813,15 @@ const Cloud = {
       sessionStorage.removeItem('pkce_verifier');
       const r = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', { method: 'POST', body });
       const j = await r.json();
-      if (!r.ok) throw new Error('Login Microsoft fallito: ' + (j.error_description || j.error || r.status));
+      if (!r.ok) throw new Error(t('cloud.loginFailed', { msg: j.error_description || j.error || r.status }));
       return j;
     },
     url() { return `https://graph.microsoft.com/v1.0/me/drive/special/approot:/${encodeURIComponent(CFG.cloudFileName)}`; },
     async api(token, url, opts = {}) {
       const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + token }, opts.headers || {}) }));
-      if (r.status === 401) { clearToken('microsoft'); throw new Error('Sessione Microsoft scaduta, riprova'); }
-      if (r.status === 404) throw new Error('Nessun backup trovato su OneDrive');
-      if (!r.ok) throw new Error('OneDrive: errore ' + r.status);
+      if (r.status === 401) { clearToken('microsoft'); throw new Error(t('cloud.expired', { p: 'Microsoft' })); }
+      if (r.status === 404) throw new Error(t('cloud.noBackup', { p: 'OneDrive' }));
+      if (!r.ok) throw new Error(t('cloud.error', { p: 'OneDrive', status: r.status }));
       return r;
     },
     async upload(token, body) {
@@ -782,9 +830,9 @@ const Cloud = {
     async download(token) {
       const meta = await (await this.api(token, this.url())).json();
       const dl = meta['@microsoft.graph.downloadUrl'];
-      if (!dl) throw new Error('OneDrive: link di download non disponibile');
+      if (!dl) throw new Error(t('cloud.dlUnavailable'));
       const r = await fetch(dl);
-      if (!r.ok) throw new Error('OneDrive: download fallito');
+      if (!r.ok) throw new Error(t('cloud.dlFailed'));
       return r.json();
     }
   }
@@ -802,25 +850,25 @@ function clearToken(p) { sessionStorage.removeItem('tok_' + p); }
 async function cloudAction(provider, action) {
   const P = Cloud[provider];
   if (!P.enabled()) {
-    await ask({ title: P.label + ' non configurato', text: `Per il collegamento diretto serve un ID client in config.js (vedi README). In alternativa usa "Esporta backup" e scegli ${P.label} dal foglio di condivisione / "Salva su File".`, cancel: null });
+    await ask({ title: t('cloud.notConfiguredTitle', { p: P.label }), text: t('cloud.notConfiguredText', { p: P.label }), cancel: null });
     return;
   }
   const token = getToken(provider);
   if (!token) {
     sessionStorage.setItem('pending_cloud', JSON.stringify({ provider, action }));
-    toast('Reindirizzamento a ' + P.label + '…');
+    toast(t('cloud.redirect', { p: P.label }));
     return P.authorize();
   }
   try {
     if (action === 'backup') {
       const backup = await makeBackup();
       if (!backup) return;
-      toast('Caricamento su ' + P.label + '…');
+      toast(t('cloud.uploading', { p: P.label }));
       await P.upload(token, JSON.stringify(backup));
       await markBackup(P.label);
-      toast('Backup salvato su ' + P.label + ' ✔');
+      toast(t('cloud.saved', { p: P.label }));
     } else {
-      toast('Download da ' + P.label + '…');
+      toast(t('cloud.downloading', { p: P.label }));
       const backup = await P.download(token);
       await restoreFromBackup(backup, P.label);
     }
@@ -836,13 +884,13 @@ async function handleOAuthReturn() {
   try {
     if (hash.get('access_token') || hash.get('error')) {
       handled = true;
-      if (hash.get('error')) throw new Error('Accesso Google annullato');
-      if (!expected || hash.get('state') !== expected) throw new Error('Stato OAuth non valido');
+      if (hash.get('error')) throw new Error(t('cloud.cancelled', { p: 'Google' }));
+      if (!expected || hash.get('state') !== expected) throw new Error(t('cloud.state'));
       setToken('google', hash.get('access_token'), hash.get('expires_in'));
     } else if (query.get('code') || query.get('error')) {
       handled = true;
-      if (query.get('error')) throw new Error('Accesso Microsoft annullato');
-      if (!expected || query.get('state') !== expected) throw new Error('Stato OAuth non valido');
+      if (query.get('error')) throw new Error(t('cloud.cancelled', { p: 'Microsoft' }));
+      if (!expected || query.get('state') !== expected) throw new Error(t('cloud.state'));
       const j = await Cloud.microsoft.exchange(query.get('code'));
       setToken('microsoft', j.access_token, j.expires_in);
     }
@@ -865,14 +913,14 @@ function runPendingCloud() {
 
 /* ---------- Azioni ---------- */
 async function wipe() {
-  const r = await ask({ title: 'Cancellare tutto?', text: 'Scrivi CANCELLA per eliminare definitivamente tutte le carte e la password di backup da questo dispositivo. I backup già salvati non vengono toccati.', fields: [{ id: 'c', placeholder: 'CANCELLA' }], ok: 'Elimina', danger: true });
-  if (!r || r.c.trim().toUpperCase() !== 'CANCELLA') return;
+  const r = await ask({ title: t('wipe.title'), text: t('wipe.text', { word: t('wipe.word') }), fields: [{ id: 'c', placeholder: t('wipe.word') }], ok: t('wipe.ok'), danger: true });
+  if (!r || r.c.trim().toUpperCase() !== t('wipe.word').toUpperCase()) return;
   await DB.del('store'); await DB.del('backupkey');
   sessionStorage.clear();
   S.data = normalizeData({});
   await persist();
   history.replaceState({ view: 'list' }, ''); renderView('list');
-  toast('Dati cancellati');
+  toast(t('wipe.done'));
 }
 
 document.addEventListener('click', async (e) => {
@@ -888,10 +936,10 @@ document.addEventListener('click', async (e) => {
     case 'close-scan': stopScanner(); break;
     case 'delete': {
       const c = S.data.cards.find((x) => x.id === S.editingId);
-      if (!c || !(await ask({ title: 'Eliminare "' + c.name + '"?', ok: 'Elimina', danger: true }))) return;
+      if (!c || !(await ask({ title: t('del.title', { name: c.name }), ok: t('del.ok'), danger: true }))) return;
       S.data.cards = S.data.cards.filter((x) => x.id !== c.id);
       await persist();
-      toast('Carta eliminata');
+      toast(t('toast.cardDeleted'));
       history.replaceState({ view: 'list' }, ''); renderView('list');
       break;
     }
@@ -900,11 +948,11 @@ document.addEventListener('click', async (e) => {
     case 'cloud-backup': cloudAction(b.dataset.provider, 'backup'); break;
     case 'cloud-restore': cloudAction(b.dataset.provider, 'restore'); break;
     case 'backup-pw':
-      if (await askNewBackupPassword('Nuova password di backup')) { toast('Password di backup salvata. I prossimi backup useranno questa.', 4000); renderSettings(); }
+      if (await askNewBackupPassword(t('bpw.newTitle'))) { toast(t('bpw.saved'), 4000); renderSettings(); }
       break;
     case 'wipe': wipe(); break;
     case 'migrate-reset': {
-      const ok = await ask({ title: 'Ricominciare da zero?', text: 'Le carte salvate con la vecchia versione verranno eliminate da questo telefono.', ok: 'Ricomincia', danger: true });
+      const ok = await ask({ title: t('migrate.title'), text: t('migrate.text'), ok: t('migrate.ok'), danger: true });
       if (!ok) return;
       await DB.del('vault');
       S.data = normalizeData({}); await persist(); enterApp();
@@ -927,7 +975,7 @@ $('#form-unlock').addEventListener('submit', async (e) => {
     await DB.set('backupkey', { key, salt: old.kdf.salt, iterations: old.kdf.iterations });
     await DB.del('vault');
     $('#unlock-pw').value = '';
-    toast('Aggiornamento completato: da ora l\'app si apre senza codice', 4000);
+    toast(t('migrate.done'), 4000);
     enterApp();
   } catch (err) {
     $('#unlock-error').textContent = err.message; $('#unlock-error').hidden = false;
@@ -953,15 +1001,17 @@ function enterApp() {
   }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   if (!window.isSecureContext || !crypto.subtle) {
-    document.body.innerHTML = '<p style="padding:24px">Questa app richiede HTTPS (Web Crypto non disponibile).</p>';
+    document.body.innerHTML = '<p style="padding:24px">' + t('err.https') + '</p>'; document.documentElement.classList.remove('i18n-pending');
     return;
   }
+  await loadLang(LANG);
+  applyI18n();
   await handleOAuthReturn();
   S.key = await getDeviceKey();
   const store = await DB.get('store');
   if (store) {
     try { S.data = normalizeData(await Crypto.decrypt(S.key, store.iv, store.ct)); }
-    catch { S.data = normalizeData({}); toast('Impossibile leggere i dati salvati', 5000); }
+    catch { S.data = normalizeData({}); toast(t('err.storage'), 5000); }
   } else if (await DB.get('vault')) {
     showView('lock'); history.replaceState({ view: 'lock' }, '');
     return;
@@ -988,7 +1038,7 @@ function showGate() {
   }
   ['safari-new', 'safari-old', 'chrome', 'browser', 'inapp'].forEach((k) => { $('#gate-' + k).hidden = k !== which; });
   $('#gate-legacy').hidden = n === 0;
-  $('#gate-count').textContent = n === 1 ? '1 carta' : n + ' carte';
+  $('#gate-legacy-text').innerHTML = t('gate.legacy', { n });
   showView('gate');
   history.replaceState({ view: 'gate' }, '');
 }
@@ -1005,15 +1055,16 @@ function showGate() {
 $('#version-footer').textContent = 'FidUP! v' + APP_VERSION;
 
 /* ---------- Slogan: nome del dispositivo ---------- */
-(function deviceWord() {
+function deviceWord() {
   const ua = navigator.userAgent;
   const ipad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  let w = 'dispositivo';
+  let w = t('device.generic');
   if (ipad) w = 'iPad';
   else if (/iPhone|iPod/.test(ua)) w = 'iPhone';
-  else if (/Android/.test(ua)) w = /Mobile/.test(ua) ? 'smartphone' : 'tablet';
+  else if (/Android/.test(ua)) w = /Mobile/.test(ua) ? t('device.smartphone') : t('device.tablet');
   document.querySelectorAll('.device-word').forEach((el) => { el.textContent = w; });
-})();
+}
+
 
 /* ---------- Installazione come app ---------- */
 const Install = {
@@ -1041,12 +1092,12 @@ const Install = {
     else if (this.isAndroid()) show.add(this.deferred ? 'prompt' : 'android');
     else { show.add('desktop'); if (this.deferred) show.add('prompt'); } // computer: QR per lo smartphone (+ installazione sul computer se possibile)
     ['prompt', 'android', 'ios', 'inapp', 'desktop'].forEach((m) => { $('#install-' + m).hidden = !show.has(m); });
-    $('#install-prompt button').textContent = show.has('desktop') ? '💻 Installa su questo computer' : '📲 Installa';
+    $('#install-prompt button').textContent = show.has('desktop') ? t('install.btnDesktop') : t('install.btn');
     banner.hidden = show.size === 0;
   }
 };
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); Install.deferred = e; Install.render(); });
-window.addEventListener('appinstalled', () => { Install.deferred = null; $('#install-banner').hidden = true; toast('FidUP! installata ✔ Aprila dalla schermata Home'); });
+window.addEventListener('appinstalled', () => { Install.deferred = null; $('#install-banner').hidden = true; toast(t('installed.toast')); });
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-action]');
   if (!b) return;
@@ -1066,7 +1117,7 @@ document.addEventListener('click', async (e) => {
       history.back(); setTimeout(() => { Install.render(true); window.scrollTo(0, 0); }, 50);
       break;
     case 'copy-link':
-      try { await navigator.clipboard.writeText(REDIRECT_URI); toast('Link copiato: incollalo in Safari o Chrome'); }
+      try { await navigator.clipboard.writeText(REDIRECT_URI); toast(t('copy.done')); }
       catch { toast(REDIRECT_URI, 6000); }
       break;
   }

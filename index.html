@@ -28,29 +28,46 @@
       <div class="slogan slogan-gate"><p class="slogan-text"><span class="hl">Nessuna registrazione</span>, <span class="hl">nessun dato in cloud</span><sup>*</sup>. Resta tutto sul tuo <span class="device-word">dispositivo</span>, <span class="hl">anche offline!</span></p><p class="footnote">* Salvo i backup cifrati che scegli tu di salvare su Google Drive o OneDrive: nessuno, nemmeno Google o Microsoft, può leggerli.</p></div>
       <p class="muted small">Su iPhone FidUP! si usa come app installata.</p>
 
-      <div id="gate-safari">
-        <div id="gate-share">
-          <ol class="steps left">
-            <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> in basso <span class="muted small">(se non lo vedi, prima tocca <b>···</b>)</span></li>
-            <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
-            <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
-            <li>Apri <b>FidUP!</b> dalla schermata Home</li>
-          </ol>
-        </div>
-        <div id="gate-profile" hidden>
-          <a class="btn primary" href="#" id="gate-install">📲 Installa FidUP!</a>
-          <ol class="steps left">
-            <li>Tocca <b>Consenti</b> per scaricare il profilo</li>
-            <li>Apri <b>Impostazioni</b> e tocca <b>Profilo scaricato</b> (in alto)</li>
-            <li>Tocca <b>Installa</b>, inserisci il codice del telefono e conferma</li>
-            <li>Apri <b>FidUP!</b> dalla schermata Home</li>
-          </ol>
-          <p class="muted small">iOS indica il profilo come "Non verificato": è normale, aggiunge solo l'icona di FidUP! alla schermata Home.</p>
-        </div>
+      <!-- Istruzioni per installare: cambiano in base al browser e alla versione di iOS -->
+      <div id="gate-safari-new" class="gate-steps" hidden>
+        <p class="gate-browser">Su <b>Safari</b>:</p>
+        <ol class="steps left">
+          <li>Tocca <b>···</b> accanto alla barra dell'indirizzo</li>
+          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></li>
+          <li>Scorri in basso e tocca <b>Aggiungi alla schermata Home</b> (a volte è sotto <b>Altro</b>)<br><span class="muted small">Non la trovi? In fondo alla lista tocca <b>Modifica azioni</b> e aggiungi <b>Aggiungi alla schermata Home</b>.</span></li>
+          <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
+          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+        </ol>
       </div>
-
-      <div id="gate-other" hidden>
-        <p>Per installare FidUP! apri questa pagina in <b>Safari</b>.</p>
+      <div id="gate-safari-old" class="gate-steps" hidden>
+        <p class="gate-browser">Su <b>Safari</b>:</p>
+        <ol class="steps left">
+          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> nella barra in basso</li>
+          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b><br><span class="muted small">Non la trovi? In fondo alla lista tocca <b>Modifica azioni</b> e aggiungi <b>Aggiungi alla schermata Home</b>.</span></li>
+          <li>Tocca <b>Aggiungi</b></li>
+          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+        </ol>
+      </div>
+      <div id="gate-chrome" class="gate-steps" hidden>
+        <p class="gate-browser">Su <b>Chrome</b>:</p>
+        <ol class="steps left">
+          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> nella barra dell'indirizzo, in alto a destra <span class="muted small">(oppure <b>···</b> → <b>Condividi</b>)</span></li>
+          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
+          <li>Tocca <b>Aggiungi</b></li>
+          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+        </ol>
+      </div>
+      <div id="gate-browser" class="gate-steps" hidden>
+        <ol class="steps left">
+          <li>Apri il menu del browser e tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></li>
+          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
+          <li>Tocca <b>Aggiungi</b></li>
+          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+        </ol>
+        <p class="muted small">Se non trovi la voce, apri questa pagina in <b>Safari</b> o <b>Chrome</b>.</p>
+      </div>
+      <div id="gate-inapp" class="gate-steps" hidden>
+        <p>Stai usando il browser interno di un'altra app: da qui non si può installare FidUP!.<br>Apri questa pagina in <b>Safari</b> o <b>Chrome</b>.</p>
         <button class="btn" data-action="copy-link">📋 Copia link</button>
       </div>
 

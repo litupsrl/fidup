@@ -28,10 +28,10 @@ Non c'è nessun processo di build: sono file statici.
 
 ### Installazione guidata
 - **Android**: l'app mostra il pulsante **📲 Installa**, oppure le istruzioni se il browser non lo supporta.
-- **iPhone**: se il sito viene aperto nel browser, le carte non sono accessibili (i dati di Safari e quelli dell'app installata sono separati). Compare una pagina con i passaggi Condividi → Aggiungi alla schermata Home. Se `profileUrl` è impostato in `config.js`, la pagina avvia invece il download del profilo. L'app installata viene riconosciuta dalla modalità standalone o dal parametro `?app=1`.
+- **iPhone**: se il sito viene aperto nel browser, le carte non sono accessibili (i dati del browser e quelli dell'app installata sono separati) e compaiono solo le istruzioni per aggiungerla alla schermata Home, diverse per Safari (iOS 26+ con menu ···, versioni precedenti), Chrome, altri browser e browser interni delle app. L'app installata viene riconosciuta dalla modalità standalone o dal parametro `?app=1`.
 - **Browser interni** (Instagram, Facebook…): invita ad aprire la pagina in Safari o Chrome.
 - **QR code** e volantino stampabile si trovano in `qr/`.
-- **Profilo iPhone** `fidup.mobileconfig` (⚠️ GitHub Pages lo invia con il tipo sbagliato e Safari lo mostra come testo: va ospitato su un server che usi `Content-Type: application/x-apple-aspen-config`, es. Cloudflare Pages o Netlify, e il suo indirizzo va messo in `profileUrl` in `config.js`): aggiunge l'icona a schermo intero. Da link: Impostazioni → Profilo scaricato → Installa (iOS lo segnala come "non verificato" perché non è firmato). Con un MDM aziendale (Intune, Jamf…) si può distribuire senza intervento dell'utente. Se cambi l'indirizzo dell'app, aggiorna l'URL nel profilo.
+- **Profilo iPhone** `fidup.mobileconfig` (⚠️ GitHub Pages lo invia con il tipo sbagliato e Safari lo mostra come testo: va ospitato su un server che usi `Content-Type: application/x-apple-aspen-config`, es. Cloudflare Pages o Netlify, ; l'app non lo usa più, resta disponibile per la distribuzione tramite MDM): aggiunge l'icona a schermo intero. Da link: Impostazioni → Profilo scaricato → Installa (iOS lo segnala come "non verificato" perché non è firmato). Con un MDM aziendale (Intune, Jamf…) si può distribuire senza intervento dell'utente. Se cambi l'indirizzo dell'app, aggiorna l'URL nel profilo.
 
 ## 3. Backup su Google Drive / OneDrive
 

@@ -119,3 +119,5 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
   pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .license-note { text-align: center; font-size: 11.5px; line-height: 1.5; color: var(--muted); margin: 22px 16px 8px; }
 #view-list .license-note { max-width: 760px; margin-left: auto; margin-right: auto; }
+.gate-browser { margin: 4px 0 0; text-align: left; }
+.gate-steps .steps li { margin: 8px 0; }

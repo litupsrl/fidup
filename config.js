@@ -12,9 +12,5 @@ window.APP_CONFIG = {
   // Microsoft Entra (portal.azure.com) → Registrazioni app → ID applicazione (client), piattaforma "SPA"
   microsoftClientId: '',
   // Nome del file di backup nel cloud
-  cloudFileName: 'fidup-backup.json',
-  // Indirizzo del profilo iPhone (fidup.mobileconfig). Va ospitato su un server che lo invii con
-  // Content-Type "application/x-apple-aspen-config" (es. Cloudflare Pages o Netlify con file _headers).
-  // GitHub Pages NON lo fa: lasciare vuoto finché il profilo non è ospitato altrove.
-  profileUrl: ''
+  cloudFileName: 'fidup-backup.json'
 };

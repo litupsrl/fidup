@@ -5,9 +5,9 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.8.3';
+const APP_VERSION = '1.9.0';
 const KDF_ITERATIONS = 600000;
-const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', profileUrl: '' }, window.APP_CONFIG || {});
+const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
 const $ = (s) => document.querySelector(s);
 const enc = new TextEncoder();
@@ -776,24 +776,22 @@ function enterApp() {
 
 /** iPhone nel browser: niente carte, solo installazione dell'app (profilo). */
 function showGate() {
-  const safari = Install.isSafari() && !Install.isInApp();
+  const ua = navigator.userAgent;
   const n = S.data.cards.length;
-  $('#gate-safari').hidden = !safari;
-  $('#gate-other').hidden = safari;
+  let which;
+  if (Install.isInApp()) which = 'inapp';
+  else if (/CriOS/.test(ua)) which = 'chrome';
+  else if (/FxiOS|EdgiOS|OPiOS|DuckDuckGo|YaBrowser/.test(ua)) which = 'browser';
+  else {
+    // Safari: da iOS 26 (Safari 26) "Condividi" è dentro il menu ···
+    const v = parseInt((ua.match(/Version\/(\d+)/) || [])[1] || '0', 10);
+    which = v >= 26 || v === 0 ? 'safari-new' : 'safari-old';
+  }
+  ['safari-new', 'safari-old', 'chrome', 'browser', 'inapp'].forEach((k) => { $('#gate-' + k).hidden = k !== which; });
   $('#gate-legacy').hidden = n === 0;
   $('#gate-count').textContent = n === 1 ? '1 carta' : n + ' carte';
   showView('gate');
   history.replaceState({ view: 'gate' }, '');
-  // Profilo iPhone: solo se ospitato su un server che lo invia come application/x-apple-aspen-config
-  // (GitHub Pages non lo fa: Safari mostrerebbe il file come testo). Altrimenti istruzioni "Aggiungi alla Home".
-  const profile = CFG.profileUrl;
-  $('#gate-profile').hidden = !profile;
-  $('#gate-share').hidden = !!profile;
-  if (profile) $('#gate-install').href = profile;
-  if (profile && safari && n === 0 && !sessionStorage.getItem('gate_auto')) {
-    sessionStorage.setItem('gate_auto', '1');
-    setTimeout(() => { location.href = profile; }, 400);
-  }
 }
 
 

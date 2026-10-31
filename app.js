@@ -1,7 +1,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -765,3 +765,52 @@ function enterApp() {
   enterApp();
 })();
 
+
+/* ---------- Installazione come app ---------- */
+const Install = {
+  deferred: null,
+  standalone: () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true,
+  isIOS: () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
+  isAndroid: () => /Android/.test(navigator.userAgent),
+  isInApp: () => /FBAN|FBAV|Instagram|Line\/|LinkedInApp|GSA\/|TikTok|Snapchat/.test(navigator.userAgent),
+  dismissed() { return Number(localStorage.getItem('install_dismissed') || 0) > Date.now() - 7 * 864e5; },
+  render(force) {
+    const banner = $('#install-banner');
+    $('#settings-install').hidden = this.standalone();
+    if (this.standalone() || (!force && this.dismissed())) { banner.hidden = true; return; }
+    let mode = null;
+    if (this.isInApp()) mode = 'inapp';
+    else if (this.deferred) mode = 'prompt';
+    else if (this.isIOS()) mode = 'ios';
+    else if (this.isAndroid()) mode = 'android';
+    ['prompt', 'android', 'ios', 'inapp'].forEach((m) => { $('#install-' + m).hidden = m !== mode; });
+    banner.hidden = !mode;
+  }
+};
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); Install.deferred = e; Install.render(); });
+window.addEventListener('appinstalled', () => { Install.deferred = null; $('#install-banner').hidden = true; toast('FidUP! installata ✔ Aprila dalla schermata Home'); });
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-action]');
+  if (!b) return;
+  switch (b.dataset.action) {
+    case 'install':
+      if (!Install.deferred) return;
+      Install.deferred.prompt();
+      await Install.deferred.userChoice.catch(() => {});
+      Install.deferred = null; Install.render();
+      break;
+    case 'install-dismiss':
+      localStorage.setItem('install_dismissed', String(Date.now()));
+      $('#install-banner').hidden = true;
+      break;
+    case 'install-show':
+      localStorage.removeItem('install_dismissed');
+      history.back(); setTimeout(() => { Install.render(true); window.scrollTo(0, 0); }, 50);
+      break;
+    case 'copy-link':
+      try { await navigator.clipboard.writeText(REDIRECT_URI); toast('Link copiato: incollalo in Safari o Chrome'); }
+      catch { toast(REDIRECT_URI, 6000); }
+      break;
+  }
+});
+Install.render();

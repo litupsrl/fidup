@@ -40,6 +40,31 @@
         <button class="icon-btn" data-action="settings" title="Impostazioni" aria-label="Impostazioni">⚙️</button>
       </div>
     </header>
+    <div id="install-banner" class="install" hidden>
+      <div class="install-head">
+        <img src="icons/icon-192.png" alt="" class="install-icon">
+        <div><b>Installa FidUP! come app</b><br><span class="muted small">Si apre dalla schermata Home e funziona anche senza internet.</span></div>
+      </div>
+      <div id="install-prompt" hidden>
+        <button class="btn primary" data-action="install">📲 Installa</button>
+      </div>
+      <div id="install-android" hidden>
+        <ol class="steps"><li>Tocca il menu <b>⋮</b> in alto a destra</li><li>Tocca <b>Installa app</b> (o <b>Aggiungi a schermata Home</b>)</li></ol>
+      </div>
+      <div id="install-ios" hidden>
+        <ol class="steps">
+          <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> <span class="muted small">(se non lo vedi, prima tocca <b>···</b>)</span></li>
+          <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
+          <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
+        </ol>
+        <a href="fidup.mobileconfig" class="small">In alternativa: installa con profilo iPhone</a>
+      </div>
+      <div id="install-inapp" hidden>
+        <p class="small">Stai usando il browser interno di un'altra app. Apri questa pagina in <b>Safari</b> (iPhone) o <b>Chrome</b> (Android) per installarla.</p>
+        <button class="btn" data-action="copy-link">📋 Copia link</button>
+      </div>
+      <button class="link-btn" data-action="install-dismiss">Non ora</button>
+    </div>
     <div class="search-wrap"><input type="search" id="search" placeholder="Cerca…" autocomplete="off"></div>
     <ul id="card-list" class="card-grid"></ul>
     <div id="empty" class="form center" hidden>
@@ -127,6 +152,11 @@
       <h2>Password di backup</h2>
       <p class="muted small">L'app si apre senza codice: le carte sono cifrate con una chiave che resta solo su questo telefono. La password di backup serve unicamente per ripristinare i backup su un altro dispositivo.</p>
       <button class="btn" data-action="backup-pw" id="btn-backup-pw">🔑 Imposta password di backup</button>
+
+      <div id="settings-install" hidden>
+        <h2>Installazione</h2>
+        <button class="btn" data-action="install-show">📲 Installa come app</button>
+      </div>
 
       <h2>Zona pericolosa</h2>
       <button class="btn danger" data-action="wipe">Cancella tutti i dati da questo dispositivo</button>

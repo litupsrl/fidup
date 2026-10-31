@@ -26,6 +26,13 @@ Non c'è nessun processo di build: sono file statici.
   Va aperta **sempre dall'icona**, perché Safari e l'app installata hanno archivi separati.
 - **Android** (Chrome): menu ⋮ → **Installa app** / *Aggiungi a schermata Home*.
 
+### Installazione guidata
+- **Android**: l'app mostra il pulsante **📲 Installa**, oppure le istruzioni se il browser non lo supporta.
+- **iPhone**: l'app mostra un banner con i 3 passaggi (Condividi → Aggiungi alla schermata Home).
+- **Browser interni** (Instagram, Facebook…): invita ad aprire la pagina in Safari o Chrome.
+- **QR code** e volantino stampabile si trovano in `qr/`.
+- **Profilo iPhone** `fidup.mobileconfig`: aggiunge l'icona a schermo intero. Da link: Impostazioni → Profilo scaricato → Installa (iOS lo segnala come "non verificato" perché non è firmato). Con un MDM aziendale (Intune, Jamf…) si può distribuire senza intervento dell'utente. Se cambi l'indirizzo dell'app, aggiorna l'URL nel profilo.
+
 ## 3. Backup su Google Drive / OneDrive
 
 ### Opzione A: senza configurazione (consigliata)

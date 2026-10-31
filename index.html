@@ -17,35 +17,18 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- PRIMA CONFIGURAZIONE -->
-  <section id="view-setup" class="view auth" hidden>
-    <div class="auth-box">
-      <img src="icons/icon-192.png" alt="" class="logo">
-      <h1>FidUP!</h1>
-      <p class="muted">Le tue carte sono cifrate (AES-256) e salvate solo su questo dispositivo. Scegli una password principale.</p>
-      <form id="form-setup" autocomplete="off">
-        <input type="password" id="setup-pw" placeholder="Password principale (min. 8 caratteri)" minlength="8" required autocomplete="new-password">
-        <input type="password" id="setup-pw2" placeholder="Ripeti password" minlength="8" required autocomplete="new-password">
-        <p class="warn">⚠️ Se dimentichi la password i dati non sono recuperabili: nessuno (nemmeno lo sviluppatore) può decifrarli.</p>
-        <button type="submit" class="btn primary">Crea archivio cifrato</button>
-      </form>
-      <div class="sep">oppure</div>
-      <button class="btn" data-action="restore-file">Ripristina da file di backup</button>
-      <button class="btn" data-action="cloud-restore" data-provider="google">Ripristina da Google Drive</button>
-      <button class="btn" data-action="cloud-restore" data-provider="microsoft">Ripristina da OneDrive</button>
-    </div>
-  </section>
-
-  <!-- SBLOCCO -->
+  <!-- AGGIORNAMENTO DALLA VERSIONE 1.0 (una sola volta) -->
   <section id="view-lock" class="view auth" hidden>
     <div class="auth-box">
       <img src="icons/icon-192.png" alt="" class="logo">
       <h1>FidUP!</h1>
+      <p class="muted">Da questa versione l'app si apre senza codice. Inserisci un'ultima volta la vecchia password per trasferire le carte: diventerà la tua password di backup.</p>
       <form id="form-unlock" autocomplete="off">
-        <input type="password" id="unlock-pw" placeholder="Password" required autocomplete="current-password">
-        <button type="submit" class="btn primary">Sblocca</button>
+        <input type="password" id="unlock-pw" placeholder="Vecchia password" required autocomplete="current-password">
+        <button type="submit" class="btn primary">Aggiorna</button>
       </form>
       <p id="unlock-error" class="error" hidden></p>
+      <button class="btn danger" data-action="migrate-reset">Non la ricordo: ricomincia da zero</button>
     </div>
   </section>
 
@@ -54,13 +37,18 @@
     <header class="topbar">
       <h1>FidUP!</h1>
       <div class="actions">
-        <button class="icon-btn" data-action="lock" title="Blocca" aria-label="Blocca">🔒</button>
         <button class="icon-btn" data-action="settings" title="Impostazioni" aria-label="Impostazioni">⚙️</button>
       </div>
     </header>
     <div class="search-wrap"><input type="search" id="search" placeholder="Cerca…" autocomplete="off"></div>
     <ul id="card-list" class="card-grid"></ul>
-    <p id="empty" class="muted center" hidden>Nessuna carta. Tocca <b>+</b> per aggiungerne una.</p>
+    <div id="empty" class="form center" hidden>
+      <p class="muted">Nessuna carta. Tocca <b>+</b> per aggiungerne una.</p>
+      <p class="muted small">Hai già un backup?</p>
+      <button class="btn" data-action="restore-file">📥 Ripristina da file</button>
+      <button class="btn" data-action="cloud-restore" data-provider="google">⬇️ Ripristina da Google Drive</button>
+      <button class="btn" data-action="cloud-restore" data-provider="microsoft">⬇️ Ripristina da OneDrive</button>
+    </div>
     <button class="fab" data-action="new" aria-label="Aggiungi carta">+</button>
   </section>
 
@@ -124,7 +112,7 @@
     </header>
     <div class="form">
       <h2>Backup cifrato</h2>
-      <p class="muted small">Il backup è lo stesso archivio cifrato con la tua password: chi lo trova nel cloud non può leggerlo.</p>
+      <p class="muted small">Il backup è cifrato con la tua password di backup: chi lo trova nel cloud non può leggerlo.</p>
       <button class="btn" data-action="backup-share">📤 Esporta backup (Condividi / Salva su File)</button>
       <button class="btn" data-action="restore-file">📥 Importa backup da file</button>
       <h3>Cloud diretto</h3>
@@ -136,17 +124,9 @@
       </div>
       <p id="last-backup" class="muted small"></p>
 
-      <h2>Sicurezza</h2>
-      <label>Blocco automatico dopo
-        <select id="s-autolock">
-          <option value="0">Subito (all'uscita dall'app)</option>
-          <option value="1">1 minuto</option>
-          <option value="5">5 minuti</option>
-          <option value="15">15 minuti</option>
-          <option value="60">1 ora</option>
-        </select>
-      </label>
-      <button class="btn" data-action="change-pw">🔑 Cambia password</button>
+      <h2>Password di backup</h2>
+      <p class="muted small">L'app si apre senza codice: le carte sono cifrate con una chiave che resta solo su questo telefono. La password di backup serve unicamente per ripristinare i backup su un altro dispositivo.</p>
+      <button class="btn" data-action="backup-pw" id="btn-backup-pw">🔑 Imposta password di backup</button>
 
       <h2>Zona pericolosa</h2>
       <button class="btn danger" data-action="wipe">Cancella tutti i dati da questo dispositivo</button>

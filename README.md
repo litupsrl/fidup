@@ -3,12 +3,11 @@
 Web app installabile (PWA) che fa una sola cosa: conservare le carte fedeltà.
 
 - **Solo locale**: i dati restano nel browser del telefono (IndexedDB) e non c'è nessun server.
-- **Cifratura**: AES-256-GCM. La chiave deriva dalla password con PBKDF2-SHA256 (600.000 iterazioni). Sul disco finisce solo il testo cifrato; la chiave resta in memoria e non è esportabile.
-- **Backup cifrato**: il file di backup è l'archivio cifrato stesso, quindi Google o Microsoft non possono leggerlo.
+- **Si apre senza codice**: le carte sono cifrate (AES-256-GCM) con una chiave generata sul telefono al primo avvio, non esportabile e conservata solo nel browser. Sul disco finisce solo il testo cifrato.
+- **Backup cifrato**: viene cifrato con una *password di backup* (PBKDF2-SHA256, 600.000 iterazioni), chiesta una sola volta e poi ricordata. Ti serve solo per ripristinare su un altro telefono, e Google o Microsoft non possono leggere il file.
 - **Offline**: un service worker mette l'app in cache.
 - **Scansione**: fotocamera o foto. Su Android usa il `BarcodeDetector` nativo, su iPhone la libreria ZXing inclusa.
 - **Formati**: EAN-13, EAN-8, UPC-A/E, Code 128, Code 39, ITF, Codabar, QR, oppure solo numero.
-- **Blocco automatico** quando l'app va in background, con tempo configurabile.
 
 ## 1. Pubblicazione gratuita su HTTPS (obbligatorio)
 
@@ -71,7 +70,9 @@ Apple Wallet richiederebbe pass `.pkpass` firmati con un certificato Apple Devel
 
 ## 5. Note di sicurezza
 
-- **Password dimenticata = dati persi** (by design). Usa una passphrase lunga, perché il backup sta nel cloud e potrebbe subire un attacco offline.
+- Chi ha il telefono sbloccato può aprire l'app: la protezione all'apertura è il codice o il Face ID del telefono.
+- **Password di backup dimenticata = backup illeggibile** (by design). Le carte sul telefono restano comunque accessibili, e da Impostazioni puoi impostarne una nuova e rifare il backup. Usa una passphrase lunga, perché il backup sta nel cloud.
+- **Offline**: dopo la prima apertura con internet, l'app funziona completamente senza connessione; serve la rete solo per il backup diretto su cloud. Su iPhone la prima apertura **dall'icona** deve avvenire con internet, perché l'app installata ha una memoria separata da Safari.
 - iOS non cancella i dati delle PWA installate in Home dopo 7 giorni di inattività (quella regola riguarda i siti in Safari). Fai comunque backup periodici.
 - CSP restrittiva: script solo dal proprio dominio, connessioni solo verso le API Google e Microsoft.
 - Dopo una modifica ai file aumenta la versione in `sw.js` (`CACHE`) così i telefoni scaricano l'aggiornamento.

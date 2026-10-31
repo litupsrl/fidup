@@ -1,7 +1,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -75,19 +75,31 @@ const Crypto = {
   }
 };
 
-function validateVault(v) {
-  if (!v || v.app !== 'fidup' || v.version !== 1 || !v.kdf || !v.iv || !v.ct) throw new Error('File non valido');
+/* Archivio locale: cifrato con una chiave del dispositivo (AES-256, NON esportabile),
+   generata al primo avvio e conservata in IndexedDB. Nessun codice da digitare.
+   Backup: cifrati con una "password di backup" scelta dall'utente (PBKDF2 → AES-256). */
+
+async function getDeviceKey() {
+  let k = await DB.get('devkey');
+  if (k) return k;
+  k = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  await DB.set('devkey', k);
+  return k;
+}
+
+function validateBackup(v) {
+  if (!v || v.app !== 'fidup' || ![1, 2].includes(v.version) || !v.kdf || !v.iv || !v.ct) throw new Error('File di backup non valido');
   const it = v.kdf.iterations;
   if (!Number.isInteger(it) || it < 100000 || it > 10000000) throw new Error('Parametri di cifratura non validi');
   return v;
 }
 
-/** Prova a decifrare un archivio con la password. Ritorna {key, data} o lancia errore. */
-async function openVault(vault, password) {
-  validateVault(vault);
-  const key = await Crypto.deriveKey(password, unb64(vault.kdf.salt), vault.kdf.iterations);
+/** Decifra un backup (o il vecchio archivio v1) con la password. Ritorna {key, data}. */
+async function openBackup(b, password) {
+  validateBackup(b);
+  const key = await Crypto.deriveKey(password, unb64(b.kdf.salt), b.kdf.iterations);
   try {
-    const data = await Crypto.decrypt(key, vault.iv, vault.ct);
+    const data = await Crypto.decrypt(key, b.iv, b.ct);
     return { key, data: normalizeData(data) };
   } catch { throw new Error('Password errata'); }
 }
@@ -96,48 +108,54 @@ function normalizeData(d) {
   d = d && typeof d === 'object' ? d : {};
   return {
     cards: Array.isArray(d.cards) ? d.cards.filter((c) => c && c.id && typeof c.name === 'string') : [],
-    settings: Object.assign({ autoLock: 5 }, d.settings || {}),
     meta: Object.assign({}, d.meta || {})
   };
 }
 
 /* ---------- Stato ---------- */
 const S = {
-  key: null,       // CryptoKey non estraibile, solo in memoria
-  vault: null,     // record cifrato {app, version, kdf, iv, ct, updatedAt}
-  data: null,      // dati in chiaro (solo in memoria mentre sbloccato)
+  key: null,       // chiave del dispositivo (non esportabile)
+  data: null,      // dati in chiaro, solo in memoria
   currentId: null,
-  editingId: null,
-  hiddenAt: 0,
-  suspendLock: false
+  editingId: null
 };
 
 async function persist() {
   const { iv, ct } = await Crypto.encrypt(S.key, S.data);
-  S.vault = Object.assign({}, S.vault, { iv, ct, updatedAt: new Date().toISOString() });
-  await DB.set('vault', S.vault);
+  await DB.set('store', { app: 'fidup', version: 2, iv, ct, updatedAt: new Date().toISOString() });
 }
 
-async function createVault(password, data) {
+/** Chiave per i backup: chiesta una sola volta e poi ricordata (non esportabile). */
+async function setBackupPassword(password) {
   const salt = rnd(16);
   const key = await Crypto.deriveKey(password, salt, KDF_ITERATIONS);
-  S.key = key; S.data = normalizeData(data);
-  S.vault = { app: 'fidup', version: 1, kdf: { alg: 'PBKDF2-SHA256', iterations: KDF_ITERATIONS, salt: b64(salt) } };
-  await persist();
+  await DB.set('backupkey', { key, salt: b64(salt), iterations: KDF_ITERATIONS });
 }
-
-function lock() {
-  S.key = null; S.data = null; S.currentId = null; S.editingId = null;
-  $('#card-list').replaceChildren();
-  $('#detail-code').replaceChildren();
-  stopScanner();
-  document.querySelectorAll('dialog[open]').forEach((d) => d.close('cancel'));
-  showView('lock');
-  history.replaceState({ view: 'lock' }, '');
+async function askNewBackupPassword(title) {
+  const r = await ask({
+    title,
+    text: 'Serve a cifrare i backup nel cloud. Ti verrà chiesta SOLO per ripristinare su un altro telefono: annotala in un posto sicuro, senza di essa il backup è illeggibile.',
+    fields: [{ id: 'p1', type: 'password', placeholder: 'Password di backup (min. 8)' }, { id: 'p2', type: 'password', placeholder: 'Ripeti password' }],
+    ok: 'Salva'
+  });
+  if (!r) return false;
+  if (r.p1.length < 8) { toast('Almeno 8 caratteri'); return false; }
+  if (r.p1 !== r.p2) { toast('Le password non coincidono'); return false; }
+  await setBackupPassword(r.p1);
+  return true;
+}
+async function makeBackup() {
+  let bk = await DB.get('backupkey');
+  if (!bk) {
+    if (!(await askNewBackupPassword('Scegli la password di backup'))) return null;
+    bk = await DB.get('backupkey');
+  }
+  const { iv, ct } = await Crypto.encrypt(bk.key, S.data);
+  return { app: 'fidup', type: 'backup', version: 2, kdf: { alg: 'PBKDF2-SHA256', iterations: bk.iterations, salt: bk.salt }, iv, ct, createdAt: new Date().toISOString() };
 }
 
 /* ---------- Navigazione ---------- */
-const VIEWS = ['setup', 'lock', 'list', 'detail', 'edit', 'settings'];
+const VIEWS = ['lock', 'list', 'detail', 'edit', 'settings'];
 function showView(name) {
   VIEWS.forEach((v) => { $('#view-' + v).hidden = v !== name; });
   window.scrollTo(0, 0);
@@ -148,7 +166,7 @@ function go(name) {
   renderView(name);
 }
 function renderView(name) {
-  if (!S.key) return;
+  if (!S.data) return;
   if (name === 'list') renderList();
   if (name === 'detail') renderDetail();
   if (name === 'edit') renderEdit();
@@ -156,9 +174,9 @@ function renderView(name) {
   showView(name);
 }
 window.addEventListener('popstate', (e) => {
-  if (!S.key) { history.replaceState({ view: 'lock' }, ''); return; }
+  if (!S.data) { history.replaceState({ view: 'lock' }, ''); return; }
   const v = (e.state && e.state.view) || 'list';
-  renderView(['setup', 'lock'].includes(v) ? 'list' : v);
+  renderView(v === 'lock' ? 'list' : v);
 });
 
 /* ---------- Elenco ---------- */
@@ -331,7 +349,6 @@ function onScanResult(text, rawFormat) {
 }
 
 async function startScanner() {
-  S.suspendLock = true;
   $('#scanner').hidden = false;
   $('#scanner-msg').textContent = 'Inquadra il codice a barre';
   const video = $('#scanner-video');
@@ -373,7 +390,6 @@ function stopScanner() {
   scanner = null;
   const v = $('#scanner-video'); if (v.srcObject) { v.srcObject.getTracks().forEach((t) => t.stop()); v.srcObject = null; }
   $('#scanner').hidden = true;
-  S.suspendLock = false;
 }
 
 async function scanFromPhoto(file) {
@@ -401,17 +417,15 @@ async function scanFromPhoto(file) {
     toast('Nessun codice trovato nella foto', 4000);
   } catch (e) { toast('Impossibile leggere la foto'); }
 }
-$('#scan-photo').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; S.suspendLock = false; if (f) scanFromPhoto(f); });
-$('#scan-photo').addEventListener('click', () => { S.suspendLock = true; });
+$('#scan-photo').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) scanFromPhoto(f); });
 
 /* ---------- Impostazioni ---------- */
-function renderSettings() {
-  $('#s-autolock').value = String(S.data.settings.autoLock);
+async function renderSettings() {
   const lb = S.data.meta.lastBackup;
   $('#last-backup').textContent = lb ? `Ultimo backup: ${fmtDate(lb.date)} (${lb.where})` : 'Nessun backup ancora eseguito.';
   $('#app-version').textContent = 'Versione ' + APP_VERSION + ' · ' + S.data.cards.length + ' carte';
+  $('#btn-backup-pw').textContent = (await DB.get('backupkey')) ? '🔑 Cambia password di backup' : '🔑 Imposta password di backup';
 }
-$('#s-autolock').addEventListener('change', async (e) => { S.data.settings.autoLock = Number(e.target.value); await persist(); toast('Salvato'); });
 
 async function markBackup(where) {
   S.data.meta.lastBackup = { date: new Date().toISOString(), where };
@@ -420,13 +434,11 @@ async function markBackup(where) {
 }
 
 /* ---------- Backup su file ---------- */
-function backupBlob() { return new Blob([JSON.stringify(S.vault)], { type: 'application/json' }); }
-
 async function backupShare() {
-  await markBackup('file'); // aggiorna prima, così il file contiene anche la data del backup
+  const backup = await makeBackup();
+  if (!backup) return;
   const name = `fidup-backup-${today()}.json`;
-  const file = new File([backupBlob()], name, { type: 'application/json' });
-  S.suspendLock = true;
+  const file = new File([JSON.stringify(backup)], name, { type: 'application/json' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: 'Backup FidUP!' });
@@ -437,59 +449,54 @@ async function backupShare() {
       setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
       toast('Backup scaricato');
     }
+    await markBackup('file');
   } catch (e) { if (e.name !== 'AbortError') toast('Errore: ' + e.message); }
-  finally { S.suspendLock = false; }
 }
 
 function pickRestoreFile() {
-  S.suspendLock = true;
   const inp = $('#restore-input'); inp.value = ''; inp.click();
 }
 $('#restore-input').addEventListener('change', async (e) => {
-  S.suspendLock = false;
   const f = e.target.files[0]; if (!f) return;
   if (f.size > 20 * 1024 * 1024) return toast('File troppo grande');
-  try { await restoreFromVault(JSON.parse(await f.text()), 'file'); }
+  try { await restoreFromBackup(JSON.parse(await f.text()), 'file'); }
   catch (err) { toast(err.message || 'File non valido', 4000); }
 });
 
 /** Ripristino comune (file o cloud). */
-async function restoreFromVault(vault, source) {
-  validateVault(vault);
-  const r = await ask({ title: 'Password del backup', text: 'Inserisci la password con cui è stato creato il backup.', fields: [{ id: 'pw', type: 'password', placeholder: 'Password' }], ok: 'Decifra' });
+async function restoreFromBackup(backup, source) {
+  validateBackup(backup);
+  const r = await ask({ title: 'Password di backup', text: 'Inserisci la password con cui è stato creato il backup.', fields: [{ id: 'pw', type: 'password', placeholder: 'Password' }], ok: 'Decifra' });
   if (!r) return;
   let opened;
-  try { opened = await openVault(vault, r.pw); } catch (e) { toast(e.message, 4000); return; }
+  try { opened = await openBackup(backup, r.pw); } catch (e) { toast(e.message, 4000); return; }
 
-  if (!S.key) {
-    // nuovo dispositivo / archivio vuoto: adotta direttamente l'archivio del backup
-    S.key = opened.key; S.data = opened.data; S.vault = vault;
-    await DB.set('vault', vault);
-    await persist();
-    toast(`Ripristinate ${S.data.cards.length} carte`);
-    enterApp();
-    return;
-  }
-  const choice = await ask({
-    title: `Backup con ${opened.data.cards.length} carte`,
-    text: 'Unisci: aggiunge le carte del backup a quelle attuali (tiene la versione più recente). Sostituisci: elimina le carte attuali.',
-    ok: 'Unisci', cancel: 'Altre opzioni'
-  });
-  if (choice) {
-    const map = new Map(S.data.cards.map((c) => [c.id, c]));
-    for (const c of opened.data.cards) {
-      const cur = map.get(c.id);
-      if (!cur || (c.updatedAt || '') > (cur.updatedAt || '')) map.set(c.id, c);
-    }
-    S.data.cards = [...map.values()];
-  } else {
-    const rep = await ask({ title: 'Sostituire tutte le carte?', text: 'Le carte attuali verranno eliminate e sostituite da quelle del backup. La password resta quella attuale.', ok: 'Sostituisci', danger: true });
-    if (!rep) return;
+  if (S.data.cards.length === 0) {
     S.data.cards = opened.data.cards;
+  } else {
+    const choice = await ask({
+      title: `Backup con ${opened.data.cards.length} carte`,
+      text: 'Unisci: aggiunge le carte del backup a quelle attuali (tiene la versione più recente). Sostituisci: elimina le carte attuali.',
+      ok: 'Unisci', cancel: 'Altre opzioni'
+    });
+    if (choice) {
+      const map = new Map(S.data.cards.map((c) => [c.id, c]));
+      for (const c of opened.data.cards) {
+        const cur = map.get(c.id);
+        if (!cur || (c.updatedAt || '') > (cur.updatedAt || '')) map.set(c.id, c);
+      }
+      S.data.cards = [...map.values()];
+    } else {
+      const rep = await ask({ title: 'Sostituire tutte le carte?', text: 'Le carte attuali verranno eliminate e sostituite da quelle del backup.', ok: 'Sostituisci', danger: true });
+      if (!rep) return;
+      S.data.cards = opened.data.cards;
+    }
   }
+  // se su questo telefono non c'è ancora una password di backup, usa quella appena inserita
+  if (!(await DB.get('backupkey'))) await DB.set('backupkey', { key: opened.key, salt: backup.kdf.salt, iterations: backup.kdf.iterations });
   await persist();
-  toast('Ripristino completato (' + source + ')');
-  renderView('list'); history.replaceState({ view: 'list' }, '');
+  toast(`Ripristino completato: ${S.data.cards.length} carte (${source})`);
+  history.replaceState({ view: 'list' }, ''); renderView('list');
 }
 
 /* ---------- Cloud (Google Drive / OneDrive) via OAuth2 nel browser ---------- */
@@ -606,15 +613,16 @@ async function cloudAction(provider, action) {
   }
   try {
     if (action === 'backup') {
-      if (!S.key) throw new Error('Sblocca prima l\'app');
-      await markBackup(P.label);
+      const backup = await makeBackup();
+      if (!backup) return;
       toast('Caricamento su ' + P.label + '…');
-      await P.upload(token, JSON.stringify(S.vault));
+      await P.upload(token, JSON.stringify(backup));
+      await markBackup(P.label);
       toast('Backup salvato su ' + P.label + ' ✔');
     } else {
       toast('Download da ' + P.label + '…');
-      const vault = await P.download(token);
-      await restoreFromVault(vault, P.label);
+      const backup = await P.download(token);
+      await restoreFromBackup(backup, P.label);
     }
   } catch (e) { toast(e.message || String(e), 5000); }
 }
@@ -651,33 +659,19 @@ async function handleOAuthReturn() {
 function runPendingCloud() {
   const pending = JSON.parse(sessionStorage.getItem('pending_cloud') || 'null');
   if (!pending || !getToken(pending.provider)) return;
-  if (pending.action === 'backup' && !S.key) return; // aspetta lo sblocco
   sessionStorage.removeItem('pending_cloud');
   cloudAction(pending.provider, pending.action);
 }
 
 /* ---------- Azioni ---------- */
-async function changePassword() {
-  const r = await ask({ title: 'Cambia password', fields: [
-    { id: 'old', type: 'password', placeholder: 'Password attuale' },
-    { id: 'n1', type: 'password', placeholder: 'Nuova password (min. 8)' },
-    { id: 'n2', type: 'password', placeholder: 'Ripeti nuova password' }] });
-  if (!r) return;
-  if (r.n1.length < 8) return toast('La nuova password deve avere almeno 8 caratteri');
-  if (r.n1 !== r.n2) return toast('Le password non coincidono');
-  try { await openVault(S.vault, r.old); } catch { return toast('Password attuale errata'); }
-  await createVault(r.n1, S.data);
-  toast('Password cambiata. Ricorda di rifare il backup.', 4000);
-}
-
 async function wipe() {
-  const r = await ask({ title: 'Cancellare tutto?', text: 'Scrivi CANCELLA per eliminare definitivamente tutte le carte da questo dispositivo. I backup già salvati non vengono toccati.', fields: [{ id: 'c', placeholder: 'CANCELLA' }], ok: 'Elimina', danger: true });
+  const r = await ask({ title: 'Cancellare tutto?', text: 'Scrivi CANCELLA per eliminare definitivamente tutte le carte e la password di backup da questo dispositivo. I backup già salvati non vengono toccati.', fields: [{ id: 'c', placeholder: 'CANCELLA' }], ok: 'Elimina', danger: true });
   if (!r || r.c.trim().toUpperCase() !== 'CANCELLA') return;
-  await DB.del('vault');
+  await DB.del('store'); await DB.del('backupkey');
   sessionStorage.clear();
-  S.key = null; S.data = null; S.vault = null;
-  showView('setup');
-  history.replaceState({ view: 'setup' }, '');
+  S.data = normalizeData({});
+  await persist();
+  history.replaceState({ view: 'list' }, ''); renderView('list');
   toast('Dati cancellati');
 }
 
@@ -690,7 +684,6 @@ document.addEventListener('click', async (e) => {
     case 'edit': S.editingId = S.currentId; go('edit'); break;
     case 'back': case 'cancel-edit': history.back(); break;
     case 'settings': go('settings'); break;
-    case 'lock': lock(); break;
     case 'scan': startScanner(); break;
     case 'close-scan': stopScanner(); break;
     case 'delete': {
@@ -706,29 +699,35 @@ document.addEventListener('click', async (e) => {
     case 'restore-file': pickRestoreFile(); break;
     case 'cloud-backup': cloudAction(b.dataset.provider, 'backup'); break;
     case 'cloud-restore': cloudAction(b.dataset.provider, 'restore'); break;
-    case 'change-pw': changePassword(); break;
+    case 'backup-pw':
+      if (await askNewBackupPassword('Nuova password di backup')) { toast('Password di backup salvata. I prossimi backup useranno questa.', 4000); renderSettings(); }
+      break;
     case 'wipe': wipe(); break;
+    case 'migrate-reset': {
+      const ok = await ask({ title: 'Ricominciare da zero?', text: 'Le carte salvate con la vecchia versione verranno eliminate da questo telefono.', ok: 'Ricomincia', danger: true });
+      if (!ok) return;
+      await DB.del('vault');
+      S.data = normalizeData({}); await persist(); enterApp();
+      break;
+    }
   }
 });
 
-$('#form-setup').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const p1 = $('#setup-pw').value, p2 = $('#setup-pw2').value;
-  if (p1.length < 8) return toast('Almeno 8 caratteri');
-  if (p1 !== p2) return toast('Le password non coincidono');
-  const btn = e.submitter; if (btn) btn.disabled = true;
-  try { await createVault(p1, {}); $('#form-setup').reset(); enterApp(); }
-  finally { if (btn) btn.disabled = false; }
-});
-
+/* Migrazione una tantum dalla versione 1.0 (che chiedeva una password all'apertura). */
 $('#form-unlock').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = e.submitter; if (btn) btn.disabled = true;
   $('#unlock-error').hidden = true;
   try {
-    const { key, data } = await openVault(S.vault, $('#unlock-pw').value);
-    S.key = key; S.data = data;
+    const old = await DB.get('vault');
+    const { key, data } = await openBackup(old, $('#unlock-pw').value);
+    S.data = data;
+    await persist();
+    // la vecchia password diventa la password di backup
+    await DB.set('backupkey', { key, salt: old.kdf.salt, iterations: old.kdf.iterations });
+    await DB.del('vault');
     $('#unlock-pw').value = '';
+    toast('Aggiornamento completato: da ora l\'app si apre senza codice', 4000);
     enterApp();
   } catch (err) {
     $('#unlock-error').textContent = err.message; $('#unlock-error').hidden = false;
@@ -742,19 +741,6 @@ function enterApp() {
   runPendingCloud();
 }
 
-/* ---------- Blocco automatico ---------- */
-document.addEventListener('visibilitychange', () => {
-  if (!S.key) return;
-  if (document.hidden) {
-    S.hiddenAt = Date.now();
-    if (S.data.settings.autoLock === 0 && !S.suspendLock) lock();
-  } else if (S.hiddenAt && !S.suspendLock) {
-    const mins = S.data.settings.autoLock;
-    if (Date.now() - S.hiddenAt >= mins * 60000) lock();
-    S.hiddenAt = 0;
-  }
-});
-
 /* ---------- Avvio ---------- */
 (async function init() {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -764,7 +750,18 @@ document.addEventListener('visibilitychange', () => {
     return;
   }
   await handleOAuthReturn();
-  S.vault = await DB.get('vault');
-  if (S.vault) { showView('lock'); history.replaceState({ view: 'lock' }, ''); }
-  else { showView('setup'); history.replaceState({ view: 'setup' }, ''); runPendingCloud(); }
+  S.key = await getDeviceKey();
+  const store = await DB.get('store');
+  if (store) {
+    try { S.data = normalizeData(await Crypto.decrypt(S.key, store.iv, store.ct)); }
+    catch { S.data = normalizeData({}); toast('Impossibile leggere i dati salvati', 5000); }
+  } else if (await DB.get('vault')) {
+    showView('lock'); history.replaceState({ view: 'lock' }, '');
+    return;
+  } else {
+    S.data = normalizeData({});
+    await persist();
+  }
+  enterApp();
 })();
+

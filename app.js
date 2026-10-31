@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.8.2';
+const APP_VERSION = '1.8.3';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', profileUrl: '' }, window.APP_CONFIG || {});
 
@@ -744,7 +744,14 @@ function enterApp() {
 
 /* ---------- Avvio ---------- */
 (async function init() {
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) {
+    // quando arriva una nuova versione, ricarica una volta per mostrarla subito
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (hadController && !sessionStorage.getItem('sw_reloaded')) { sessionStorage.setItem('sw_reloaded', '1'); location.reload(); }
+    });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((r) => r.update()).catch(() => {});
+  }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   if (!window.isSecureContext || !crypto.subtle) {
     document.body.innerHTML = '<p style="padding:24px">Questa app richiede HTTPS (Web Crypto non disponibile).</p>';

@@ -1,5 +1,9 @@
 Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)
 
+> Questa licenza si applica a tutte le versioni di FidUP! pubblicate in questo repository, incluse quelle precedenti all'introduzione del file LICENSE.
+>
+> This license applies to all versions of FidUP! published in this repository, including those prior to the introduction of the LICENSE file.
+
 # PolyForm Noncommercial License 1.0.0
 
 <https://polyformproject.org/licenses/noncommercial/1.0.0>

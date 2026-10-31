@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.11.1';
+const APP_VERSION = '1.12.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -111,7 +111,8 @@ async function openBackup(b, password) {
 function normalizeData(d) {
   d = d && typeof d === 'object' ? d : {};
   return {
-    cards: Array.isArray(d.cards) ? d.cards.filter((c) => c && c.id && typeof c.name === 'string') : [],
+    cards: Array.isArray(d.cards) ? d.cards.filter((c) => c && c.id && typeof c.name === 'string')
+      .map((c) => (c.uses == null ? Object.assign(c, { uses: c.lastUsed ? 1 : 0 }) : c)) : [],
     meta: Object.assign({}, d.meta || {})
   };
 }
@@ -185,10 +186,17 @@ window.addEventListener('popstate', (e) => {
 });
 
 /* ---------- Elenco ---------- */
+/* Ordine dell'elenco: 'uses' = più usate (predefinito), 'recent' = usate di recente, 'az' = alfabetico */
 function sortedCards() {
-  return [...S.data.cards].sort((a, b) => (b.lastUsed || '').localeCompare(a.lastUsed || '') || a.name.localeCompare(b.name, 'it'));
+  const mode = S.data.meta.sort || 'uses';
+  const byName = (a, b) => a.name.localeCompare(b.name, 'it', { sensitivity: 'base' });
+  const byRecent = (a, b) => (b.lastUsed || b.createdAt || '').localeCompare(a.lastUsed || a.createdAt || '');
+  const byUses = (a, b) => (b.uses || 0) - (a.uses || 0);
+  const cmp = mode === 'az' ? [byName] : mode === 'recent' ? [byRecent, byName] : [byUses, byRecent, byName];
+  return [...S.data.cards].sort((a, b) => { for (const f of cmp) { const r = f(a, b); if (r) return r; } return 0; });
 }
 function renderList() {
+  $('#sort').value = S.data.meta.sort || 'uses';
   const q = $('#search').value.trim().toLowerCase();
   const list = $('#card-list');
   const cards = sortedCards().filter((c) => !q || c.name.toLowerCase().includes(q) || (c.note || '').toLowerCase().includes(q));
@@ -212,9 +220,10 @@ $('#card-list').addEventListener('click', async (e) => {
   S.currentId = li.dataset.id;
   go('detail');
   const c = S.data.cards.find((x) => x.id === S.currentId);
-  if (c) { c.lastUsed = new Date().toISOString(); persist().catch(() => {}); }
+  if (c) { c.lastUsed = new Date().toISOString(); c.uses = (c.uses || 0) + 1; persist().catch(() => {}); }
 });
 $('#search').addEventListener('input', renderList);
+$('#sort').addEventListener('change', async (e) => { S.data.meta.sort = e.target.value; renderList(); await persist(); });
 
 /* ---------- Codici a barre ---------- */
 function renderCode(box, number, format, large) {

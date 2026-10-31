@@ -135,7 +135,14 @@
       </div>
       <button class="link-btn" data-action="install-dismiss">Non ora</button>
     </div>
-    <div class="search-wrap"><input type="search" id="search" placeholder="Cerca…" autocomplete="off"></div>
+    <div class="search-wrap">
+      <input type="search" id="search" placeholder="Cerca…" autocomplete="off">
+      <select id="sort" aria-label="Ordina le carte">
+        <option value="uses">Più usate</option>
+        <option value="recent">Recenti</option>
+        <option value="az">A-Z</option>
+      </select>
+    </div>
     <ul id="card-list" class="card-grid"></ul>
     <div id="empty" class="form center" hidden>
       <p class="muted">Nessuna carta. Tocca <b>+</b> per aggiungerne una.</p>

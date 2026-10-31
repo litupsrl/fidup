@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.8.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', profileUrl: '' }, window.APP_CONFIG || {});
 
@@ -821,13 +821,14 @@ const Install = {
     const banner = $('#install-banner');
     $('#settings-install').hidden = this.standalone();
     if (this.standalone() || (!force && this.dismissed())) { banner.hidden = true; return; }
-    let mode = null;
-    if (this.isInApp()) mode = 'inapp';
-    else if (this.deferred) mode = 'prompt';
-    else if (this.isIOS()) mode = 'ios';
-    else if (this.isAndroid()) mode = 'android';
-    ['prompt', 'android', 'ios', 'inapp'].forEach((m) => { $('#install-' + m).hidden = m !== mode; });
-    banner.hidden = !mode;
+    const show = new Set();
+    if (this.isInApp()) show.add('inapp');
+    else if (this.isIOS()) show.add(this.deferred ? 'prompt' : 'ios');
+    else if (this.isAndroid()) show.add(this.deferred ? 'prompt' : 'android');
+    else { show.add('desktop'); if (this.deferred) show.add('prompt'); } // computer: QR per lo smartphone (+ installazione sul computer se possibile)
+    ['prompt', 'android', 'ios', 'inapp', 'desktop'].forEach((m) => { $('#install-' + m).hidden = !show.has(m); });
+    $('#install-prompt button').textContent = show.has('desktop') ? '💻 Installa su questo computer' : '📲 Installa';
+    banner.hidden = show.size === 0;
   }
 };
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); Install.deferred = e; Install.render(); });

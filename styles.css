@@ -111,3 +111,6 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
   .search-wrap, .card-grid, #empty, #view-list .install, #view-list .donate { max-width: 760px; margin-left: auto; margin-right: auto; }
   .auth-box { max-width: 460px; }
 }
+.install-qr { display: flex; gap: 16px; align-items: center; margin-top: 12px; }
+.install-qr img { width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 6px; flex: none; }
+.install-qr p { margin: 6px 0 0; }

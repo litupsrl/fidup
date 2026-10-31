@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- Sorgente del volantino FidUP! (A4). Rigenerare PDF/PNG con lo script in README (sezione Volantino). -->
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>FidUP! – 宣传单</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --black: #3A3A3A; --green: #B1C900; --green-text: #6E7D00; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 210mm; height: 297mm; font-family: Inter, "WenQuanYi Zen Hei", "DejaVu Sans", sans-serif; color: var(--black); background: #fff;
+    display: flex; flex-direction: column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  header { background: var(--black); padding: 13mm 14mm 11mm; display: flex; align-items: center; gap: 10mm; }
+  header img { height: 30mm; }
+  header p { margin: 0; color: #fff; font-size: 17pt; font-weight: 600; line-height: 1.25; }
+  header p span { color: var(--green); }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10mm 16mm 0; }
+  .slogan { width: 100%; background: var(--black); color: #fff; border-radius: 7mm; padding: 8mm 9mm 7mm 12mm; position: relative; overflow: hidden; }
+  .slogan::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3mm; background: var(--green); }
+  .slogan ul { list-style: none; margin: 0; padding: 0; font-size: 21pt; font-weight: 800; line-height: 1.35; letter-spacing: -.01em; }
+  .slogan li::before { content: "✓"; color: var(--green); margin-right: 3mm; }
+  .slogan .hl { color: var(--green); }
+  .slogan sup { font-size: .5em; color: var(--green); }
+  .slogan .last { margin-top: 3mm; font-size: 15pt; font-weight: 700; white-space: nowrap; }
+  .qr { margin-top: 9mm; display: flex; flex-direction: column; align-items: center; }
+  .qr img { width: 80mm; height: 80mm; }
+  .qr h2 { margin: 4mm 0 1mm; font-size: 22pt; font-weight: 800; }
+  .qr .url { font-size: 14pt; color: var(--green-text); font-weight: 600; }
+  .steps { margin-top: 7mm; width: 100%; display: grid; grid-template-columns: auto 1fr; gap: 2.5mm 6mm; font-size: 12.5pt; }
+  .steps b { font-weight: 800; }
+  .note { margin-top: auto; width: 100%; padding: 6mm 0 0; font-size: 9pt; color: #6b6b6b; line-height: 1.4; }
+  footer { padding: 5mm 16mm 9mm; display: flex; justify-content: space-between; align-items: center; font-size: 10pt; color: #6b6b6b; }
+  footer .free { font-weight: 700; color: var(--black); font-size: 11pt; }
+  footer .free span { color: var(--green-text); }
+</style>
+</head>
+<body>
+  <header>
+    <img src="../brand/fidup-logo-negativo.svg" alt="FidUP!">
+    <p>你的所有会员卡<br><span>集于一个 App，随时随身。</span></p>
+  </header>
+  <main>
+    <section class="slogan">
+      <ul>
+        <li><span class="hl">无需注册</span></li>
+        <li><span class="hl">不在云端存储数据</span><sup>*</sup></li>
+        <li><span class="hl">不进行任何用户画像</span></li>
+      </ul>
+      <p class="last">所有内容都保存在你的设备上，<span class="hl">离线也能使用！</span></p>
+    </section>
+    <section class="qr">
+      <img src="fidup-qr.svg" alt="QR code">
+      <h2>用相机扫描二维码</h2>
+      <div class="url">litupsrl.github.io/fidup</div>
+    </section>
+    <section class="steps">
+      <b>iPhone</b><span>Safari 或 Chrome → 共享 → <b>添加到主屏幕</b></span>
+      <b>Android</b><span>Chrome → 轻点 <b>安装</b></span>
+    </section>
+    <p class="note">* 你自行选择保存到 Google Drive 或 OneDrive 的加密备份除外：任何人，包括 Google 或 Microsoft，都无法读取。</p>
+  </main>
+  <footer>
+    <span class="free">免费 <span>·</span> 会员卡加密保存在你的手机上</span>
+    <span>© LITUP S.r.l.</span>
+  </footer>
+</body>
+</html>

@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.11.0';
+const APP_VERSION = '1.11.1';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -984,6 +984,13 @@ function showGate() {
   history.replaceState({ view: 'gate' }, '');
 }
 
+
+/* ---------- Pulsanti cloud diretto: visibili solo se configurati in config.js ---------- */
+(function cloudButtons() {
+  const on = { google: !!CFG.googleClientId, microsoft: !!CFG.microsoftClientId };
+  document.querySelectorAll('[data-provider]').forEach((b) => { b.hidden = !on[b.dataset.provider]; });
+  $('#cloud-direct').hidden = !(on.google || on.microsoft);
+})();
 
 /* ---------- Versione in basso al centro ---------- */
 $('#version-footer').textContent = 'FidUP! v' + APP_VERSION;

@@ -54,7 +54,7 @@ Non c'è nessun processo di build: sono file statici.
 Per il ripristino usa *Importa backup da file*: il selettore file di iOS e Android mostra anche Drive e OneDrive.
 
 ### Opzione B: collegamento diretto (pulsanti ⬆️/⬇️)
-Serve registrare gratis un ID client e inserirlo in `config.js`.
+I pulsanti compaiono solo dopo aver inserito l'ID client in `config.js`: senza configurazione restano nascosti. Serve registrare gratis un ID client.
 
 **Google Drive**
 1. https://console.cloud.google.com → crea un progetto → *API e servizi → Libreria* → abilita **Google Drive API**.

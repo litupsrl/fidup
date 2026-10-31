@@ -216,14 +216,16 @@
     <div class="form">
       <h2>Backup cifrato</h2>
       <p class="muted small">Il backup è cifrato con la tua password di backup: chi lo trova nel cloud non può leggerlo.</p>
-      <button class="btn" data-action="backup-share">📤 Esporta backup (Condividi / Salva su File)</button>
+      <button class="btn" data-action="backup-share">📤 Esporta backup (Google Drive, OneDrive, File…)</button>
       <button class="btn" data-action="restore-file">📥 Importa backup da file</button>
+      <div id="cloud-direct" hidden>
       <h3>Cloud diretto</h3>
       <div class="two">
         <button class="btn" data-action="cloud-backup" data-provider="google">⬆️ Google Drive</button>
         <button class="btn" data-action="cloud-restore" data-provider="google">⬇️ Google Drive</button>
         <button class="btn" data-action="cloud-backup" data-provider="microsoft">⬆️ OneDrive</button>
         <button class="btn" data-action="cloud-restore" data-provider="microsoft">⬇️ OneDrive</button>
+      </div>
       </div>
       <p id="last-backup" class="muted small"></p>
 

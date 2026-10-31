@@ -5,9 +5,9 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.6.3';
+const APP_VERSION = '1.6.4';
 const KDF_ITERATIONS = 600000;
-const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
+const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', profileUrl: '' }, window.APP_CONFIG || {});
 
 const $ = (s) => document.querySelector(s);
 const enc = new TextEncoder();
@@ -777,10 +777,15 @@ function showGate() {
   $('#gate-count').textContent = n === 1 ? '1 carta' : n + ' carte';
   showView('gate');
   history.replaceState({ view: 'gate' }, '');
-  // apre subito il download del profilo (una volta per sessione), se non ci sono carte da salvare prima
-  if (safari && n === 0 && !sessionStorage.getItem('gate_auto')) {
+  // Profilo iPhone: solo se ospitato su un server che lo invia come application/x-apple-aspen-config
+  // (GitHub Pages non lo fa: Safari mostrerebbe il file come testo). Altrimenti istruzioni "Aggiungi alla Home".
+  const profile = CFG.profileUrl;
+  $('#gate-profile').hidden = !profile;
+  $('#gate-share').hidden = !!profile;
+  if (profile) $('#gate-install').href = profile;
+  if (profile && safari && n === 0 && !sessionStorage.getItem('gate_auto')) {
     sessionStorage.setItem('gate_auto', '1');
-    setTimeout(() => { location.href = 'fidup.mobileconfig'; }, 400);
+    setTimeout(() => { location.href = profile; }, 400);
   }
 }
 

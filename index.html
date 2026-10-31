@@ -30,18 +30,24 @@
       <p class="muted small">Su iPhone FidUP! si usa come app installata.</p>
 
       <div id="gate-safari">
-        <a class="btn primary" href="fidup.mobileconfig" id="gate-install">📲 Installa FidUP!</a>
-        <ol class="steps left">
-          <li>Tocca <b>Consenti</b> per scaricare il profilo</li>
-          <li>Apri <b>Impostazioni</b> e tocca <b>Profilo scaricato</b> (in alto)</li>
-          <li>Tocca <b>Installa</b>, inserisci il codice del telefono e conferma</li>
-          <li>Apri <b>FidUP!</b> dalla schermata Home</li>
-        </ol>
-        <p class="muted small">iOS indica il profilo come "Non verificato": è normale, aggiunge solo l'icona di FidUP! alla schermata Home.</p>
-        <details class="small left">
-          <summary>Non riesci a installare il profilo?</summary>
-          <p>In Safari tocca <b>Condividi</b> (o prima <b>···</b>) → <b>Aggiungi alla schermata Home</b> → lascia attivo <b>Apri come app web</b> → <b>Aggiungi</b>.</p>
-        </details>
+        <div id="gate-share">
+          <ol class="steps left">
+            <li>Tocca <b>Condividi</b> <svg class="ios-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11H5v10h14V11h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> in basso <span class="muted small">(se non lo vedi, prima tocca <b>···</b>)</span></li>
+            <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
+            <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
+            <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          </ol>
+        </div>
+        <div id="gate-profile" hidden>
+          <a class="btn primary" href="#" id="gate-install">📲 Installa FidUP!</a>
+          <ol class="steps left">
+            <li>Tocca <b>Consenti</b> per scaricare il profilo</li>
+            <li>Apri <b>Impostazioni</b> e tocca <b>Profilo scaricato</b> (in alto)</li>
+            <li>Tocca <b>Installa</b>, inserisci il codice del telefono e conferma</li>
+            <li>Apri <b>FidUP!</b> dalla schermata Home</li>
+          </ol>
+          <p class="muted small">iOS indica il profilo come "Non verificato": è normale, aggiunge solo l'icona di FidUP! alla schermata Home.</p>
+        </div>
       </div>
 
       <div id="gate-other" hidden>
@@ -97,7 +103,6 @@
           <li>Scorri e tocca <b>Aggiungi alla schermata Home</b></li>
           <li>Lascia attivo <b>Apri come app web</b> e tocca <b>Aggiungi</b></li>
         </ol>
-        <a href="fidup.mobileconfig" class="small">In alternativa: installa con profilo iPhone</a>
       </div>
       <div id="install-inapp" hidden>
         <p class="small">Stai usando il browser interno di un'altra app. Apri questa pagina in <b>Safari</b> (iPhone) o <b>Chrome</b> (Android) per installarla.</p>

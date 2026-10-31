@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.6.4';
+const APP_VERSION = '1.7.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', profileUrl: '' }, window.APP_CONFIG || {});
 
@@ -789,6 +789,18 @@ function showGate() {
   }
 }
 
+
+/* ---------- Slogan: nome del dispositivo ---------- */
+(function deviceWord() {
+  const ua = navigator.userAgent;
+  const ipad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let w = 'dispositivo';
+  if (ipad) w = 'iPad';
+  else if (/iPhone|iPod/.test(ua)) w = 'iPhone';
+  else if (/Android/.test(ua)) w = /Mobile/.test(ua) ? 'smartphone' : 'tablet';
+  else if (/Macintosh|Windows|Linux|CrOS/.test(ua)) w = 'computer';
+  document.querySelectorAll('.device-word').forEach((el) => { el.textContent = w; });
+})();
 
 /* ---------- Installazione come app ---------- */
 const Install = {

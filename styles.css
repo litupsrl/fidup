@@ -88,9 +88,26 @@ dialog h3 { margin-top: 0; }
 .left { text-align: left; }
 details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
 .auth-box a.btn { text-decoration: none; }
-.tagline { font-weight: 600; font-size: 16px; margin: 10px 0 14px; }
-.tagline-list { font-size: 14px; margin: 0 16px 10px; padding: 8px 12px; border-left: 4px solid var(--green); background: var(--card); border-radius: 8px; }
-.footnote { display: block; margin-top: 4px; font-size: 11px; font-weight: 400; color: var(--muted); line-height: 1.3; }
-.tagline sup { font-size: 11px; }
 .donate { text-align: center; font-size: 14px; margin: 18px 16px; color: var(--muted); }
 .donate a { font-weight: 600; text-decoration: none; white-space: nowrap; }
+
+/* Slogan: si adatta a telefono, tablet e computer */
+.slogan { background: var(--black); color: #fff; border-radius: 18px; text-align: center; position: relative; overflow: hidden;
+  padding: clamp(14px, 4vw, 26px) clamp(14px, 5vw, 32px); box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.slogan::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--green); }
+.slogan-text { margin: 0; font-weight: 800; letter-spacing: -.01em; line-height: 1.25;
+  font-size: clamp(17px, 4.8vw, 28px); text-wrap: balance; }
+.slogan .hl { color: var(--green); }
+.slogan sup { font-size: .55em; color: var(--green); }
+.slogan .footnote { margin: 8px 0 0; font-size: clamp(10.5px, 2.8vw, 13px); font-weight: 400; color: #c9c9c9; line-height: 1.35; text-wrap: balance; }
+.slogan-gate { margin: 14px 0 18px; }
+.slogan-list { margin: 0 12px 12px; }
+@media (prefers-color-scheme: dark) { .slogan { background: #262626; border: 1px solid #333; } }
+/* schermi bassi (telefono in orizzontale / piccoli): più compatto */
+@media (max-height: 560px) { .slogan-text { font-size: 16px; } .slogan .footnote { display: none; } }
+/* tablet e computer */
+@media (min-width: 700px) {
+  .slogan-list { max-width: 760px; margin: 4px auto 16px; }
+  .search-wrap, .card-grid, #empty, #view-list .install, #view-list .donate { max-width: 760px; margin-left: auto; margin-right: auto; }
+  .auth-box { max-width: 460px; }
+}

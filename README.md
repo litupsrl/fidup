@@ -9,6 +9,15 @@ Web app installabile (PWA) che fa una sola cosa: conservare le carte fedeltà.
 - **Scansione**: fotocamera o foto. Su Android usa il `BarcodeDetector` nativo, su iPhone la libreria ZXing inclusa.
 - **Formati**: EAN-13, EAN-8, UPC-A/E, Code 128, Code 39, ITF, Codabar, QR, oppure solo numero.
 
+## Suggerimento della catena
+
+Quando si aggiunge una carta, FidUP! suggerisce la catena **senza connessione e senza inviare dati**:
+- **Nome**: mentre si scrive compare un elenco di catene italiane (supermercati, casa, elettronica, libri, profumerie, abbigliamento, carburanti) e delle carte già salvate. La scelta imposta anche un colore indicativo.
+- **QR code con un link**: dal sito contenuto nel codice (es. `e-coop.it` → Coop). Se la catena non è in elenco, propone il nome del sito.
+- **Codici a barre**: se il numero ha almeno 6 cifre iniziali in comune (e la stessa lunghezza) con una carta già salvata, propone la stessa catena, con colore e formato.
+
+L'elenco delle catene e gli eventuali prefissi verificati sono in `chains.js`. Aggiungi solo prefissi controllati su carte reali.
+
 ## 1. Pubblicazione gratuita su HTTPS (obbligatorio)
 
 Fotocamera e Web Crypto funzionano solo su HTTPS. La strada più semplice è **GitHub Pages**:

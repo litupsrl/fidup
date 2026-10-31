@@ -176,7 +176,12 @@
         <button type="button" class="btn" data-action="scan">📷 Scansiona</button>
         <label class="btn">🖼️ Da foto<input type="file" id="scan-photo" accept="image/*" hidden></label>
       </div>
-      <label>Nome negozio<input id="f-name" required maxlength="60"></label>
+      <div id="chain-hint" class="chain-hint" hidden>
+        <span>💡 Sembra una carta <b id="chain-hint-name"></b></span>
+        <button type="button" class="btn primary" data-action="chain-use">Usa</button>
+      </div>
+      <label>Nome negozio<input id="f-name" required maxlength="60" autocomplete="off" placeholder="Es. Esselunga, Coop, IKEA…"></label>
+      <div id="name-suggest" class="name-suggest" hidden></div>
       <label>Numero / codice<input id="f-number" required maxlength="500" inputmode="text"></label>
       <label>Formato codice
         <select id="f-format">
@@ -266,6 +271,7 @@
   <script src="vendor/JsBarcode.all.min.js"></script>
   <script src="vendor/qrcode.js"></script>
   <script src="config.js"></script>
+  <script src="chains.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

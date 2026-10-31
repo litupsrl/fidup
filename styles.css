@@ -121,3 +121,11 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
 #view-list .license-note { max-width: 760px; margin-left: auto; margin-right: auto; }
 .gate-browser { margin: 4px 0 0; text-align: left; }
 .gate-steps .steps li { margin: 8px 0; }
+.chain-hint { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 0; padding: 8px 8px 8px 12px;
+  border-radius: 12px; background: var(--card); border: 1px solid var(--green); font-size: 15px; }
+.chain-hint .btn { width: auto; margin: 0; padding: 8px 18px; }
+.name-suggest { margin: -4px 0 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); overflow: hidden; }
+.name-opt { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: 0; border-bottom: 1px solid var(--line);
+  background: none; color: var(--fg); font-size: 16px; text-align: left; cursor: pointer; }
+.name-opt:last-child { border-bottom: 0; }
+.name-opt .dot { width: 16px; height: 16px; border-radius: 4px; flex: none; }

@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '1.10.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -262,10 +262,101 @@ function renderEdit() {
   $('#f-color').value = c ? safeColor(c.color) : '#3A3A3A';
   $('#f-note').value = c ? (c.note || '') : '';
   $('#btn-delete').hidden = !c;
+  $('#name-suggest').hidden = true;
   updatePreview();
+  updateChainHint();
 }
 function updatePreview() { renderCode($('#edit-preview'), $('#f-number').value.trim(), $('#f-format').value, false); }
 ['#f-number', '#f-format'].forEach((s) => $(s).addEventListener('input', updatePreview));
+
+/* ---------- Suggerimento della catena (tutto locale) ---------- */
+const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+const CHAIN_LIST = (window.CHAINS || []).map((c) => Object.assign({ key: norm(c.n) }, c));
+function chainByName(name) { const k = norm(name); return CHAIN_LIST.find((c) => c.key === k || c.k.includes(k)) || null; }
+
+/** Catena dal sito web contenuto nel codice (QR con link). */
+function chainFromUrl(text) {
+  let host;
+  try { host = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : 'https://' + text).hostname.toLowerCase(); } catch { return null; }
+  if (!/\./.test(host) || /\s/.test(text.trim().split('/')[0])) return null;
+  if (!/^https?:\/\//i.test(text) && !/^www\./i.test(text)) return null; // solo veri link
+  const labels = host.replace(/^www\./, '').split('.');
+  const tokens = new Set(labels.flatMap((l) => [l, ...l.split('-'), l.replace(/-/g, '')]));
+  const joined = labels.join('').replace(/-/g, '');
+  for (const c of CHAIN_LIST) {
+    for (const k of c.k) {
+      if (tokens.has(k) || (k.length >= 5 && joined.includes(k))) return { name: c.n, color: c.c, why: 'sito' };
+    }
+  }
+  // catena non in elenco: propone il nome del sito (es. "negozio-bello.it" → "Negozio Bello")
+  const base = labels.length >= 2 ? labels[labels.length - 2] : labels[0];
+  if (!base || base.length < 3) return null;
+  return { name: base.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '), color: null, why: 'sito' };
+}
+
+/** Catena dalle cifre iniziali: prefissi verificati + carte già salvate dall'utente. */
+function chainFromNumber(num) {
+  const n = num.replace(/\s/g, '');
+  if (n.length < 6) return null;
+  for (const p of (window.CHAIN_PREFIXES || [])) {
+    if (n.startsWith(p.p) && (!p.len || p.len === n.length)) { const c = chainByName(p.n); return { name: p.n, color: c ? c.c : null, why: 'prefisso' }; }
+  }
+  const minPrefix = /^\d+$/.test(n) ? 6 : 5;
+  let best = null, bestLen = 0;
+  for (const c of S.data.cards) {
+    if (c.id === S.editingId) continue;
+    const m = String(c.number).replace(/\s/g, '');
+    if (m.length !== n.length || m === n) continue;
+    let i = 0; while (i < n.length && n[i] === m[i]) i++;
+    if (i >= minPrefix && (i > bestLen || (i === bestLen && (c.updatedAt || '') > (best.updatedAt || '')))) { best = c; bestLen = i; }
+  }
+  return best ? { name: best.name, color: best.color, format: best.format, why: 'carte' } : null;
+}
+
+let chainSuggestion = null;
+function updateChainHint() {
+  const num = $('#f-number').value.trim();
+  const sug = num ? (chainFromUrl(num) || chainFromNumber(num)) : null;
+  const current = norm($('#f-name').value);
+  chainSuggestion = sug && norm(sug.name) !== current ? sug : null;
+  $('#chain-hint').hidden = !chainSuggestion;
+  if (chainSuggestion) $('#chain-hint-name').textContent = chainSuggestion.name;
+}
+function applyChain(sug) {
+  $('#f-name').value = sug.name;
+  const cat = chainByName(sug.name);
+  const color = sug.color || (cat && cat.c);
+  if (color && /^#[0-9a-f]{6}$/i.test(color)) $('#f-color').value = color;
+  if (sug.format && [...$('#f-format').options].some((o) => o.value === sug.format)) $('#f-format').value = sug.format;
+  $('#name-suggest').hidden = true;
+  updatePreview(); updateChainHint();
+}
+
+/* Elenco a comparsa mentre si scrive il nome */
+function renderNameSuggest() {
+  const box = $('#name-suggest');
+  const q = norm($('#f-name').value);
+  if (q.length < 2) { box.hidden = true; return; }
+  const own = [...new Map(S.data.cards.map((c) => [norm(c.name), { n: c.name, c: c.color, own: true }])).values()];
+  const pool = [...own, ...CHAIN_LIST.filter((c) => !own.some((o) => norm(o.n) === c.key))];
+  const score = (c) => { const k = norm(c.n); if (k === q) return -1; if (k.startsWith(q)) return 0; if ((c.k || []).some((x) => x.startsWith(q))) return 1; if (k.includes(q)) return 2; return 9; };
+  const hits = pool.map((c) => [score(c), c]).filter(([s]) => s >= 0 && s < 9).sort((x, y) => x[0] - y[0]).slice(0, 5).map(([, c]) => c);
+  if (!hits.length) { box.hidden = true; return; }
+  box.replaceChildren(...hits.map((c) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'name-opt';
+    const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = safeColor(c.c);
+    b.append(dot, document.createTextNode(c.n));
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); applyChain({ name: c.n, color: c.c }); });
+    return b;
+  }));
+  box.hidden = false;
+}
+$('#f-name').addEventListener('input', () => { renderNameSuggest(); updateChainHint(); });
+$('#f-name').addEventListener('blur', () => setTimeout(() => { $('#name-suggest').hidden = true; }, 150));
+let hintTimer;
+$('#f-number').addEventListener('input', () => { clearTimeout(hintTimer); hintTimer = setTimeout(updateChainHint, 300); });
+document.addEventListener('click', (e) => { if (e.target.closest('[data-action="chain-use"]') && chainSuggestion) applyChain(chainSuggestion); });
 
 $('#form-edit').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -345,8 +436,9 @@ function onScanResult(text, rawFormat) {
   if (f) $('#f-format').value = f;
   else { $('#f-format').value = /^\d+$/.test(text) ? 'CODE128' : 'QR'; toast('Formato ' + rawFormat + ' non riproducibile: scelto un formato alternativo, verificalo.', 5000); }
   updatePreview();
+  updateChainHint();
   if (navigator.vibrate) navigator.vibrate(60);
-  toast('Codice letto ✔');
+  toast(chainSuggestion ? 'Codice letto ✔ Sembra una carta ' + chainSuggestion.name : 'Codice letto ✔');
 }
 
 async function startScanner() {

@@ -1,3 +1,7 @@
+/*! FidUP! — Copyright LITUP S.r.l.
+ * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+ * Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)
+ * https://polyformproject.org/licenses/noncommercial/1.0.0 */
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 

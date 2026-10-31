@@ -1,5 +1,9 @@
+/*! FidUP! — Copyright LITUP S.r.l.
+ * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+ * Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)
+ * https://polyformproject.org/licenses/noncommercial/1.0.0 */
 // Service worker: rende l'app utilizzabile offline. Non vede né salva dati delle carte.
-const CACHE = 'fidup-v1.2.0';
+const CACHE = 'fidup-v1.2.1';
 const ASSETS = [
   './', 'index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest',
   'vendor/JsBarcode.all.min.js', 'vendor/qrcode.js', 'vendor/zxing.min.js',

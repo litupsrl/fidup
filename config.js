@@ -1,3 +1,7 @@
+/*! FidUP! — Copyright LITUP S.r.l.
+ * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+ * Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)
+ * https://polyformproject.org/licenses/noncommercial/1.0.0 */
 // Configurazione opzionale per il backup DIRETTO su cloud.
 // Senza questi ID funziona comunque il backup tramite "Esporta / Importa file"
 // (che su iPhone e Android permette di salvare su Google Drive o OneDrive dal foglio di condivisione).

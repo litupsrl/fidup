@@ -92,3 +92,13 @@ icons/      vendor/ (JsBarcode, qrcode-generator, ZXing; tutte licenze MIT/Apach
 ```
 
 Test locale: `python3 -m http.server 8000` → http://localhost:8000 (localhost conta come contesto sicuro).
+
+## Licenza
+
+Copyright © LITUP S.r.l.
+
+FidUP! è distribuita con la licenza [PolyForm Noncommercial 1.0.0](LICENSE.md): puoi usarla, studiarla e modificarla **solo per scopi non commerciali**. Per un uso commerciale contatta LITUP S.r.l.
+
+Le librerie nella cartella `vendor/` mantengono le proprie licenze (MIT e Apache-2.0): vedi [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Required Notice: Copyright LITUP S.r.l. (https://github.com/litupsrl/fidup)

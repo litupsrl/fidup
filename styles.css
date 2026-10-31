@@ -88,3 +88,5 @@ dialog h3 { margin-top: 0; }
 .left { text-align: left; }
 details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
 .auth-box a.btn { text-decoration: none; }
+.tagline { font-weight: 600; font-size: 16px; margin: 10px 0 14px; }
+.tagline-list { font-size: 14px; margin: 0 16px 10px; padding: 8px 12px; border-left: 4px solid var(--green); background: var(--card); border-radius: 8px; }

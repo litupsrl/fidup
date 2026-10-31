@@ -129,3 +129,4 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
   background: none; color: var(--fg); font-size: 16px; text-align: left; cursor: pointer; }
 .name-opt:last-child { border-bottom: 0; }
 .name-opt .dot { width: 16px; height: 16px; border-radius: 4px; flex: none; }
+.ocr-status { margin: 10px 0 0; padding: 8px 12px; border-radius: 12px; background: var(--card); border: 1px dashed var(--line); font-size: 14px; color: var(--muted); }

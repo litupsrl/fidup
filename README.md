@@ -16,6 +16,8 @@ Quando si aggiunge una carta, FidUP! suggerisce la catena **senza connessione e 
 - **QR code con un link**: dal sito contenuto nel codice (es. `e-coop.it` → Coop). Se la catena non è in elenco, propone il nome del sito.
 - **Codici a barre**: se il numero ha almeno 6 cifre iniziali in comune (e la stessa lunghezza) con una carta già salvata, propone la stessa catena, con colore e formato.
 
+- **Foto (OCR)**: con "Da foto" o "Scansiona", l'app legge anche le scritte della carta con Tesseract, che funziona interamente sul telefono. Se trova una catena in elenco (o il nome di una carta già salvata) compila il nome; altrimenti propone la scritta più grande. Il motore (circa 5 MB) si scarica dal sito solo al primo utilizzo e poi funziona offline.
+
 L'elenco delle catene e gli eventuali prefissi verificati sono in `chains.js`. Aggiungi solo prefissi controllati su carte reali.
 
 ## 1. Pubblicazione gratuita su HTTPS (obbligatorio)

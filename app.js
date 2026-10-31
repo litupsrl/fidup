@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.10.0';
+const APP_VERSION = '1.11.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -263,6 +263,7 @@ function renderEdit() {
   $('#f-note').value = c ? (c.note || '') : '';
   $('#btn-delete').hidden = !c;
   $('#name-suggest').hidden = true;
+  ocrRun++; ocrStatus('');
   updatePreview();
   updateChainHint();
 }
@@ -456,7 +457,7 @@ async function startScanner() {
         if (!scanner) return;
         if (t - last > 200 && video.readyState >= 2) {
           last = t;
-          try { const r = await det.detect(video); if (r.length) return onScanResult(r[0].rawValue, r[0].format); } catch {}
+          try { const r = await det.detect(video); if (r.length) { const frame = grabFrame(video); onScanResult(r[0].rawValue, r[0].format); return readBrandFrom(frame); } } catch {}
         }
         scanner.raf = requestAnimationFrame(loop);
       };
@@ -466,7 +467,7 @@ async function startScanner() {
       const reader = new ZXing.BrowserMultiFormatReader();
       scanner = { reader };
       await reader.decodeFromConstraints({ video: { facingMode: 'environment' }, audio: false }, video, (res) => {
-        if (res && scanner) onScanResult(res.getText(), ZXing.BarcodeFormat[res.getBarcodeFormat()]);
+        if (res && scanner) { const frame = grabFrame(video); onScanResult(res.getText(), ZXing.BarcodeFormat[res.getBarcodeFormat()]); readBrandFrom(frame); }
       });
     }
   } catch (err) {
@@ -485,30 +486,127 @@ function stopScanner() {
   $('#scanner').hidden = true;
 }
 
+function grabFrame(src, max = 1600) {
+  const w = src.videoWidth || src.width, h = src.videoHeight || src.height;
+  if (!w || !h) return null;
+  const s = Math.min(1, max / Math.max(w, h));
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(w * s); cv.height = Math.round(h * s);
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  return cv;
+}
 async function scanFromPhoto(file) {
+  let cv;
+  try { cv = grabFrame(await createImageBitmap(file)); } catch { return toast('Impossibile leggere la foto'); }
+  let found = false;
   try {
-    const bmp = await createImageBitmap(file);
     const det = await nativeDetector();
     if (det) {
-      const r = await det.detect(bmp);
-      if (r.length) return onScanResult(r[0].rawValue, r[0].format);
+      const r = await det.detect(cv);
+      if (r.length) { onScanResult(r[0].rawValue, r[0].format); found = true; }
     } else {
       await loadZXing();
-      // ridimensiona: le foto grandi rallentano/peggiorano la lettura
-      const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
-      const cv = document.createElement('canvas');
-      cv.width = Math.round(bmp.width * scale); cv.height = Math.round(bmp.height * scale);
-      cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
-      const hints = new Map([[ZXing.DecodeHintType.TRY_HARDER, true]]);
-      const reader = new ZXing.BrowserMultiFormatReader(hints);
-      const url = cv.toDataURL('image/png');
+      const reader = new ZXing.BrowserMultiFormatReader(new Map([[ZXing.DecodeHintType.TRY_HARDER, true]]));
       try {
-        const res = await reader.decodeFromImageUrl(url);
-        return onScanResult(res.getText(), ZXing.BarcodeFormat[res.getBarcodeFormat()]);
+        const res = await reader.decodeFromImageUrl(cv.toDataURL('image/png'));
+        onScanResult(res.getText(), ZXing.BarcodeFormat[res.getBarcodeFormat()]); found = true;
       } catch {}
     }
-    toast('Nessun codice trovato nella foto', 4000);
-  } catch (e) { toast('Impossibile leggere la foto'); }
+  } catch {}
+  if (!found) toast('Nessun codice trovato nella foto: cerco almeno il nome', 4000);
+  readBrandFrom(cv);
+}
+
+/* ---------- Nome del negozio letto dalla foto (OCR locale con Tesseract) ---------- */
+let ocrWorker = null, ocrRun = 0;
+async function getOcr() {
+  if (ocrWorker) return ocrWorker;
+  if (!window.Tesseract) {
+    await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'vendor/tesseract/tesseract.min.js'; s.onload = res; s.onerror = rej; document.head.append(s); });
+  }
+  const base = new URL('vendor/tesseract/', location.href).href;
+  ocrWorker = await Tesseract.createWorker('ita', 1, {
+    workerPath: base + 'worker.min.js', corePath: base + 'core', langPath: base + 'lang',
+    workerBlobURL: false, gzip: true, cacheMethod: 'none'
+  });
+  return ocrWorker;
+}
+function lev(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return 9;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+/** Cerca nel testo letto una catena dell'elenco o il nome di una carta già salvata. */
+function brandFromText(text) {
+  const tokens = String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9]+/).filter(Boolean);
+  const joined = tokens.join('');
+  const cands = [];
+  for (const c of S.data.cards) cands.push({ name: c.name, color: c.color, keys: [norm(c.name)] });
+  for (const c of CHAIN_LIST) cands.push({ name: c.n, color: c.c, keys: [c.key, ...c.k] });
+  let best = null, bestLen = 0;
+  for (const c of cands) {
+    for (const k of c.keys) {
+      if (!k || k.length < 3) continue;
+      const hit = k.length >= 6
+        ? joined.includes(k) || tokens.some((t) => t.length >= 5 && lev(t, k) <= 1)
+        : tokens.includes(k);
+      if (hit && k.length > bestLen) { best = c; bestLen = k.length; }
+    }
+  }
+  return best ? { name: best.name, color: best.color, why: 'foto' } : null;
+}
+function ocrStatus(msg) { const el = $('#ocr-status'); el.textContent = msg || ''; el.hidden = !msg; }
+/** Prepara l'immagine per l'OCR: scala di grigi e dimensione moderata (le scritte enormi vengono lette male). */
+function ocrImage(src, max, invert) {
+  const cv = grabFrame(src, max); const x = cv.getContext('2d');
+  const id = x.getImageData(0, 0, cv.width, cv.height); const d = id.data;
+  for (let i = 0; i < d.length; i += 4) { let g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]; if (invert) g = 255 - g; d[i] = d[i + 1] = d[i + 2] = g; }
+  x.putImageData(id, 0, 0);
+  return cv;
+}
+const OCR_GENERIC = /^(carta|card|fedelta|fidelity|socio|soci|club|member|membership|tessera|punti|premium|gold|plus|cliente|clienti|loyalty|valida|www|http|https)$/;
+/** Scritta più grande della carta (probabile nome del negozio), se non è in elenco. */
+function biggestLine(data) {
+  let best = null;
+  for (const bl of data.blocks || []) for (const pa of bl.paragraphs || []) for (const li of pa.lines || []) {
+    const words = li.words.filter((w) => w.confidence > 60 && /[A-Za-zÀ-ÿ]{2,}/.test(w.text) && !OCR_GENERIC.test(norm(w.text)));
+    const text = words.map((w) => w.text).join(' ').replace(/[^\p{L}\p{N}&' .-]/gu, '').trim();
+    if (text.replace(/[^\p{L}]/gu, '').length < 3 || text.length > 30) continue;
+    const h = li.bbox.y1 - li.bbox.y0;
+    if (!best || h > best.h) best = { text, h };
+  }
+  return best ? best.text : null;
+}
+async function readBrandFrom(canvas) {
+  if (!canvas) return;
+  const run = ++ocrRun;
+  const firstTime = !ocrWorker;
+  ocrStatus('🔎 Cerco il nome del negozio nella foto…' + (firstTime ? ' (la prima volta può richiedere qualche secondo)' : ''));
+  try {
+    const w = await getOcr();
+    let match = null, guess = null;
+    for (const [max, inv] of [[1000, false], [640, false], [1000, true]]) {
+      const { data } = await w.recognize(ocrImage(canvas, max, inv), {}, { text: true, blocks: true });
+      if (run !== ocrRun) return;
+      match = brandFromText(data.text || '');
+      if (match) break;
+      if (!guess) guess = biggestLine(data);
+    }
+    if ($('#view-edit').hidden) return;
+    ocrStatus('');
+    const nameEmpty = !$('#f-name').value.trim();
+    if (match && nameEmpty) { applyChain(match); toast('Nome trovato nella foto: ' + match.name, 3500); return; }
+    const sug = match || (guess ? { name: guess, color: null, why: 'foto' } : null);
+    if (sug && norm(sug.name) !== norm($('#f-name').value)) {
+      chainSuggestion = sug; $('#chain-hint-name').textContent = sug.name; $('#chain-hint').hidden = false;
+    } else if (!sug) toast('Nome del negozio non riconosciuto: scrivilo tu', 3500);
+  } catch (e) {
+    if (run === ocrRun) ocrStatus('');
+    if (!navigator.onLine && firstTime) toast('La lettura del nome richiede internet la prima volta', 4000);
+  }
 }
 $('#scan-photo').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) scanFromPhoto(f); });
 

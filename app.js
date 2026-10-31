@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
 
@@ -204,7 +204,7 @@ function renderList() {
   }));
   $('#empty').hidden = S.data.cards.length > 0;
 }
-function safeColor(c) { return /^#[0-9a-f]{6}$/i.test(c || '') ? c : '#1e3a5f'; }
+function safeColor(c) { return /^#[0-9a-f]{6}$/i.test(c || '') ? c : '#3A3A3A'; }
 
 $('#card-list').addEventListener('click', async (e) => {
   const li = e.target.closest('.card-tile');
@@ -259,14 +259,10 @@ function renderEdit() {
   $('#f-name').value = c ? c.name : '';
   $('#f-number').value = c ? c.number : '';
   $('#f-format').value = c ? c.format : 'CODE128';
-  $('#f-color').value = c ? safeColor(c.color) : randomColor();
+  $('#f-color').value = c ? safeColor(c.color) : '#3A3A3A';
   $('#f-note').value = c ? (c.note || '') : '';
   $('#btn-delete').hidden = !c;
   updatePreview();
-}
-function randomColor() {
-  const pal = ['#1e3a5f', '#b91c1c', '#047857', '#7c3aed', '#c2410c', '#0f766e', '#be185d', '#374151', '#a16207', '#1d4ed8'];
-  return pal[Math.floor(Math.random() * pal.length)];
 }
 function updatePreview() { renderCode($('#edit-preview'), $('#f-number').value.trim(), $('#f-format').value, false); }
 ['#f-number', '#f-format'].forEach((s) => $(s).addEventListener('input', updatePreview));

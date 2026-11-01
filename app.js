@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.2.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', prefixEmail: '' }, window.APP_CONFIG || {});
 
@@ -356,8 +356,12 @@ function chainFromUrl(text) {
 function chainFromNumber(num) {
   const n = num.replace(/\s/g, '');
   if (n.length < 6) return null;
-  for (const p of (window.CHAIN_PREFIXES || [])) {
-    if (n.startsWith(p.p) && (!p.len || p.len === n.length)) { const c = chainByName(p.n); return { name: p.n, color: c ? c.c : null, why: 'prefisso' }; }
+  // UPC-A (12 cifre) può essere letto come EAN-13 con uno 0 davanti, e viceversa: prova entrambe le forme
+  const variants = [n.toUpperCase()];
+  if (/^0\d{12}$/.test(n)) variants.push(n.slice(1));
+  if (/^\d{12}$/.test(n)) variants.push('0' + n);
+  for (const v of variants) for (const p of (window.CHAIN_PREFIXES || [])) {
+    if (v.startsWith(p.p.toUpperCase()) && (!p.len || p.len === v.length)) { const c = chainByName(p.n); return { name: p.n, color: c ? c.c : null, why: 'prefisso' }; }
   }
   const minPrefix = /^\d+$/.test(n) ? 6 : 5;
   let best = null, bestLen = 0;

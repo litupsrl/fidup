@@ -79,11 +79,60 @@ window.CHAINS = [
   { n: 'Esso', c: '#C8102E', k: ['esso'] },
   { n: 'Tamoil', c: '#C8102E', k: ['tamoil'] },
   { n: 'Autogrill', c: '#C8102E', k: ['autogrill'] },
-  { n: 'McDonald\'s', c: '#C8102E', k: ['mcdonalds'] }
+  { n: 'McDonald\'s', c: '#C8102E', k: ['mcdonalds'] },
+  // Aggiunte dai prefissi raccolti in modalità debug (novembre 2026)
+  { n: 'Benetton', c: '#00843D', k: ['benetton', 'unitedcolorsofbenetton'] },
+  { n: 'Conbipel', c: '#3A3A3A', k: ['conbipel'] },
+  { n: 'ConTé', c: '#3A3A3A', k: ['conte'] },
+  { n: 'CYao', c: '#3A3A3A', k: ['cyao'] },
+  { n: 'Èquì', c: '#3A3A3A', k: ['equi'] },
+  { n: 'Eurotessil', c: '#3A3A3A', k: ['eurotessil'] },
+  { n: "IDEXE'", c: '#3A3A3A', k: ['idexe'] },
+  { n: 'Kasanova', c: '#3A3A3A', k: ['kasanova'] },
+  { n: 'Miroglio Outlet', c: '#3A3A3A', k: ['miroglio', 'mirogliooutlet'] },
+  { n: 'Obaibi', c: '#3A3A3A', k: ['obaibi'] },
+  { n: 'Original Marines', c: '#3B82F6', k: ['originalmarines'] },
+  { n: 'Paniate', c: '#3A3A3A', k: ['paniate'] },
+  { n: 'Prénatal', c: '#3A3A3A', k: ['prenatal'] },
+  { n: 'Scarpe & Scarpe', c: '#3A3A3A', k: ['scarpeescarpe', 'scarpescarpe'] },
+  { n: 'Toys Center', c: '#3A3A3A', k: ['toyscenter'] },
+  { n: 'Venchi', c: '#3A3A3A', k: ['venchi'] },
+  { n: 'Viamaestra', c: '#3A3A3A', k: ['viamaestra'] }
 ];
 
 /* Prefissi VERIFICATI dei codici a barre (facoltativo).
    Aggiungere solo prefissi controllati su carte reali, ad esempio:
    { p: '0123', len: 13, n: 'Nome catena' }   // p = cifre iniziali, len = lunghezza del codice (0 = qualsiasi)
    L'app impara comunque da sola dalle carte già salvate dall'utente. */
-window.CHAIN_PREFIXES = [];
+// s = numero di carte diverse su cui la regola è stata verificata. Con s: 1 la regola è volutamente stretta
+// (6 caratteri + lunghezza; solo le lettere iniziali per i codici alfanumerici): da allargare quando arrivano altri esempi.
+window.CHAIN_PREFIXES = [
+  { p: '312072', len: 13, n: 'Benetton', s: 1 },
+  { p: '10317', len: 10, n: 'Bottega Verde', s: 1 },
+  { p: '226006', len: 12, n: 'Conad', s: 1 },
+  { p: '852733', len: 16, n: 'Conbipel', s: 1 },
+  { p: '402020', len: 12, n: 'ConTé', s: 1 },
+  { p: '310002', len: 13, n: 'CYao', s: 1 },
+  { p: '209229', len: 13, n: 'Decathlon', s: 1 },
+  { p: '%%', len: 9, n: 'Èquì', s: 1 },
+  { p: '400143', len: 12, n: 'Esselunga', s: 1 },
+  { p: '270617', len: 13, n: 'Euronics', s: 1 },
+  { p: 'CS', len: 7, n: 'Eurotessil', s: 1 },
+  { p: '801600', len: 13, n: "IDEXE'", s: 1 },
+  { p: '627598', len: 19, n: 'IKEA', s: 1 },
+  { p: '470225', len: 12, n: 'Il Gigante', s: 1 },
+  { p: 'KN', len: 15, n: 'Kasanova', s: 1 },
+  { p: '773900', len: 17, n: 'Lidl', s: 1 },
+  { p: '410884', len: 12, n: 'MediaWorld', s: 1 },
+  { p: '299004', len: 13, n: 'Miroglio Outlet', s: 1 },
+  { p: '3590', len: 8, n: 'Obaibi', s: 1 },
+  { p: '412626', len: 13, n: 'Original Marines', s: 1 },
+  { p: '900002', len: 14, n: 'OVS', s: 1 },
+  { p: '290003', len: 13, n: 'Paniate', s: 1 },
+  { p: '100239', len: 13, n: 'Prénatal', s: 1 },
+  { p: '970004', len: 13, n: 'Scarpe & Scarpe', s: 1 },
+  { p: '666663', len: 13, n: 'Toys Center', s: 1 },
+  { p: '400164', len: 12, n: 'Unieuro', s: 1 },
+  { p: 'V00', len: 9, n: 'Venchi', s: 1 },
+  { p: '123010', len: 13, n: 'Viamaestra', s: 1 }
+];

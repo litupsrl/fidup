@@ -1,6 +1,7 @@
 # Presentazione video FidUP!
 
 - `../fidup-presentazione.mp4`: italiano, 46 s, voce `if_sara`.
+- `../fidup-presentazione-voce.mp4`: italiano con **voce registrata** (consigliato), 48 s. Frasi ritagliate dalla registrazione secondo `seg.json`, pulizia leggera (passa-alto, riduzione fruscio, compressione), montaggio con `build_h.py`.
 - `../fidup-presentation-en.mp4`: inglese, 45 s, voce `af_heart`; schermate dell'app in inglese con carte dimostrative (`shots_en.js`).
 
 Entrambi 1080×1920 (verticale), H.264 + AAC, volume -16 LUFS (standard social). File con suffisso `_en` = versione inglese.

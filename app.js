@@ -5,9 +5,9 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 const KDF_ITERATIONS = 600000;
-const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json' }, window.APP_CONFIG || {});
+const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', prefixEmail: '' }, window.APP_CONFIG || {});
 
 const $ = (s) => document.querySelector(s);
 const enc = new TextEncoder();
@@ -673,6 +673,64 @@ async function renderSettings() {
   $('#last-backup').textContent = lb ? t('settings.lastBackup', { date: fmtDate(lb.date), where: lb.where === 'file' ? t('restore.file') : lb.where }) : t('settings.noBackup');
   $('#app-version').textContent = t('settings.version', { v: APP_VERSION, n: S.data.cards.length });
   $('#btn-backup-pw').textContent = (await DB.get('backupkey')) ? t('settings.pwChange') : t('settings.pwSet');
+  renderDebug();
+}
+
+/* ---------- Modalità debug: invio volontario dei prefissi (mai il numero completo) ---------- */
+const Debug = {
+  on: () => localStorage.getItem('debug') === '1',
+  taps: 0, timer: null
+};
+/** Quanti caratteri iniziali si possono condividere: al massimo 6 e mai più di metà del numero. */
+function prefixLen(len) { return Math.max(1, Math.min(6, Math.floor(len / 2))); }
+function prefixRows() {
+  return S.data.cards
+    .filter((c) => c.number && !/^[a-z][a-z0-9+.-]*:\/\//i.test(c.number)) // i link (QR con sito) si riconoscono già dal dominio
+    .map((c) => {
+      const n = String(c.number).replace(/\s/g, '');
+      return { chain: c.name, prefix: n.slice(0, prefixLen(n.length)), len: n.length, format: c.format, kind: /^\d+$/.test(n) ? 'num' : 'alnum' };
+    })
+    .sort((x, y) => x.chain.localeCompare(y.chain, LANG, { sensitivity: 'base' }));
+}
+function prefixText() {
+  const rows = prefixRows();
+  const head = `FidUP! prefixes v1 · app ${APP_VERSION} · ${today()}`;
+  const csv = ['chain;prefix;length;format;type', ...rows.map((r) => [r.chain.replace(/;/g, ','), r.prefix, r.len, r.format, r.kind].join(';'))];
+  return head + '\n' + csv.join('\n');
+}
+function renderDebug() {
+  const sec = $('#debug-section');
+  sec.hidden = !Debug.on();
+  if (sec.hidden) return;
+  const rows = prefixRows();
+  const box = $('#debug-preview');
+  if (!rows.length) { box.textContent = t('debug.empty'); return; }
+  const tbl = document.createElement('table');
+  const hr = tbl.insertRow(); ['debug.colChain', 'debug.colPrefix', 'debug.colLen', 'debug.colFormat'].forEach((k) => { const th = document.createElement('th'); th.textContent = t(k); hr.append(th); });
+  for (const r of rows) {
+    const tr = tbl.insertRow();
+    [r.chain, r.prefix + '…', r.len, r.format].forEach((v, i) => { const td = tr.insertCell(); td.textContent = v; if (i === 1) td.className = 'mono'; });
+  }
+  box.replaceChildren(tbl);
+}
+$('#app-version').addEventListener('click', () => {
+  if (Debug.on()) return;
+  Debug.taps++; clearTimeout(Debug.timer); Debug.timer = setTimeout(() => { Debug.taps = 0; }, 2500);
+  if (Debug.taps >= 7) { Debug.taps = 0; localStorage.setItem('debug', '1'); toast(t('debug.on')); renderDebug(); $('#debug-section').scrollIntoView({ behavior: 'smooth' }); }
+  else if (Debug.taps >= 4) toast(t('debug.tapsLeft', { n: 7 - Debug.taps }), 1200);
+});
+async function debugSend() {
+  if (!prefixRows().length) return toast(t('debug.empty'));
+  const text = prefixText();
+  if (CFG.prefixEmail) { location.href = `mailto:${CFG.prefixEmail}?subject=${encodeURIComponent(t('debug.subject'))}&body=${encodeURIComponent(text)}`; return; }
+  try {
+    if (navigator.share) { await navigator.share({ title: t('debug.subject'), text }); return; }
+  } catch (e) { if (e.name === 'AbortError') return; }
+  debugCopy();
+}
+async function debugCopy() {
+  try { await navigator.clipboard.writeText(prefixText()); toast(t('debug.copied')); }
+  catch { toast(t('err.generic', { msg: 'clipboard' })); }
 }
 
 async function markBackup(where) {
@@ -951,6 +1009,9 @@ document.addEventListener('click', async (e) => {
       if (await askNewBackupPassword(t('bpw.newTitle'))) { toast(t('bpw.saved'), 4000); renderSettings(); }
       break;
     case 'wipe': wipe(); break;
+    case 'debug-send': debugSend(); break;
+    case 'debug-copy': debugCopy(); break;
+    case 'debug-off': localStorage.removeItem('debug'); toast(t('debug.offDone')); renderDebug(); break;
     case 'migrate-reset': {
       const ok = await ask({ title: t('migrate.title'), text: t('migrate.text'), ok: t('migrate.ok'), danger: true });
       if (!ok) return;

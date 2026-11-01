@@ -196,5 +196,20 @@
   'migrate.ok': 'Neu beginnen',
   'migrate.done': 'Aktualisierung abgeschlossen: Ab jetzt öffnet sich die App ohne Code',
   'installed.toast': 'FidUP! installiert ✔ Öffne sie über den Home-Bildschirm',
-  'copy.done': 'Link kopiert: füge ihn in Safari oder Chrome ein'
+  'copy.done': 'Link kopiert: füge ihn in Safari oder Chrome ein',
+  "debug.title": "🛠 Debug-Modus",
+  "debug.text": "Hilf mit, die Erkennung der Geschäfte zu verbessern. Geteilt werden <b>nur</b> der Name des Geschäfts, die ersten Zeichen, die Länge und das Code-Format: <b>niemals die vollständige Nummer</b>. Unten siehst du genau, was gesendet wird.",
+  "debug.send": "📤 Präfixe senden",
+  "debug.copy": "📋 Kopieren",
+  "debug.off": "Debug-Modus ausschalten",
+  "debug.on": "Debug-Modus aktiviert",
+  "debug.offDone": "Debug-Modus ausgeschaltet",
+  "debug.tapsLeft": "Noch {n}-mal tippen für den Debug-Modus",
+  "debug.empty": "Keine Karten zum Teilen.",
+  "debug.copied": "Präfixe kopiert",
+  "debug.colChain": "Geschäft",
+  "debug.colPrefix": "Beginnt mit",
+  "debug.colLen": "Länge",
+  "debug.colFormat": "Format",
+  "debug.subject": "FidUP! – Kartenpräfixe"
 };

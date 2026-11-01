@@ -196,5 +196,20 @@
   'migrate.ok': 'Empezar de cero',
   'migrate.done': 'Actualización completada: desde ahora la app se abre sin código',
   'installed.toast': 'FidUP! instalada ✔ Ábrela desde la pantalla de inicio',
-  'copy.done': 'Enlace copiado: pégalo en Safari o Chrome'
+  'copy.done': 'Enlace copiado: pégalo en Safari o Chrome',
+  "debug.title": "🛠 Modo depuración",
+  "debug.text": "Ayuda a mejorar el reconocimiento de las tiendas. Se comparten <b>solo</b> el nombre de la tienda, los primeros caracteres, la longitud y el formato del código: <b>nunca el número completo</b>. Abajo ves exactamente lo que se enviará.",
+  "debug.send": "📤 Enviar prefijos",
+  "debug.copy": "📋 Copiar",
+  "debug.off": "Desactivar modo depuración",
+  "debug.on": "Modo depuración activado",
+  "debug.offDone": "Modo depuración desactivado",
+  "debug.tapsLeft": "{n} toques más para el modo depuración",
+  "debug.empty": "No hay tarjetas para compartir.",
+  "debug.copied": "Prefijos copiados",
+  "debug.colChain": "Tienda",
+  "debug.colPrefix": "Empieza por",
+  "debug.colLen": "Longitud",
+  "debug.colFormat": "Formato",
+  "debug.subject": "FidUP! – prefijos de las tarjetas"
 };

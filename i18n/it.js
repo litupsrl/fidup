@@ -198,5 +198,20 @@
   'migrate.ok': 'Ricomincia',
   'migrate.done': 'Aggiornamento completato: da ora l\'app si apre senza codice',
   'installed.toast': 'FidUP! installata ✔ Aprila dalla schermata Home',
-  'copy.done': 'Link copiato: incollalo in Safari o Chrome'
+  'copy.done': 'Link copiato: incollalo in Safari o Chrome',
+  "debug.title": "🛠 Modalità debug",
+  "debug.text": "Aiuta a migliorare il riconoscimento delle catene. Vengono condivisi <b>solo</b> nome della catena, primi caratteri, lunghezza e formato del codice: <b>mai il numero completo</b>. Qui sotto vedi esattamente cosa verrà inviato.",
+  "debug.send": "📤 Invia prefissi",
+  "debug.copy": "📋 Copia",
+  "debug.off": "Disattiva modalità debug",
+  "debug.on": "Modalità debug attiva",
+  "debug.offDone": "Modalità debug disattivata",
+  "debug.tapsLeft": "Ancora {n} tocchi per la modalità debug",
+  "debug.empty": "Nessuna carta da condividere.",
+  "debug.copied": "Prefissi copiati",
+  "debug.colChain": "Catena",
+  "debug.colPrefix": "Inizio",
+  "debug.colLen": "Lunghezza",
+  "debug.colFormat": "Formato",
+  "debug.subject": "FidUP! – prefissi delle carte"
 };

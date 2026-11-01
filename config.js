@@ -12,5 +12,7 @@ window.APP_CONFIG = {
   // Microsoft Entra (portal.azure.com) → Registrazioni app → ID applicazione (client), piattaforma "SPA"
   microsoftClientId: '',
   // Nome del file di backup nel cloud
-  cloudFileName: 'fidup-backup.json'
+  cloudFileName: 'fidup-backup.json',
+  // Modalità debug: indirizzo email proposto quando si inviano i prefissi delle carte (vuoto = solo menu di condivisione)
+  prefixEmail: ''
 };

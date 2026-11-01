@@ -139,3 +139,10 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
 .lang-select select { width: auto; margin: 0; padding: 8px 10px; font-size: 15px; }
 .gate-lang { display: flex; justify-content: flex-end; margin-bottom: 6px; }
 .settings-lang .lang-select select { min-width: 200px; }
+/* Modalità debug */
+.debug-preview { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px 10px; margin: 10px 0; max-height: 320px; overflow: auto; }
+.debug-preview table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.debug-preview th, .debug-preview td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); }
+.debug-preview td.mono { font-family: ui-monospace, Menlo, monospace; }
+.debug-preview tr:last-child td { border-bottom: 0; }
+#app-version { cursor: default; user-select: none; -webkit-user-select: none; }

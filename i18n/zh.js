@@ -197,5 +197,20 @@
   'migrate.ok': '重新开始',
   'migrate.done': '更新完成：从现在起 App 无需密码即可打开',
   'installed.toast': 'FidUP! 已安装 ✔ 请从主屏幕打开',
-  'copy.done': '链接已复制：请粘贴到 Safari 或 Chrome 中'
+  'copy.done': '链接已复制：请粘贴到 Safari 或 Chrome 中',
+  "debug.title": "🛠 调试模式",
+  "debug.text": "帮助改进商店识别。<b>仅</b>分享商店名称、开头几个字符、长度和码制：<b>绝不分享完整卡号</b>。下方显示将要发送的确切内容。",
+  "debug.send": "📤 发送前缀",
+  "debug.copy": "📋 复制",
+  "debug.off": "关闭调试模式",
+  "debug.on": "调试模式已开启",
+  "debug.offDone": "调试模式已关闭",
+  "debug.tapsLeft": "再点 {n} 次进入调试模式",
+  "debug.empty": "没有可分享的会员卡。",
+  "debug.copied": "前缀已复制",
+  "debug.colChain": "商店",
+  "debug.colPrefix": "开头",
+  "debug.colLen": "长度",
+  "debug.colFormat": "码制",
+  "debug.subject": "FidUP! – 会员卡前缀"
 };

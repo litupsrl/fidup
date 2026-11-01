@@ -196,5 +196,20 @@
   'migrate.ok': 'Start over',
   'migrate.done': 'Update complete: from now on the app opens without a code',
   'installed.toast': 'FidUP! installed ✔ Open it from the Home Screen',
-  'copy.done': 'Link copied: paste it into Safari or Chrome'
+  'copy.done': 'Link copied: paste it into Safari or Chrome',
+  "debug.title": "🛠 Debug mode",
+  "debug.text": "Help improve store recognition. <b>Only</b> the store name, the first characters, the length and the code format are shared: <b>never the full number</b>. Below you can see exactly what will be sent.",
+  "debug.send": "📤 Send prefixes",
+  "debug.copy": "📋 Copy",
+  "debug.off": "Turn off debug mode",
+  "debug.on": "Debug mode on",
+  "debug.offDone": "Debug mode off",
+  "debug.tapsLeft": "{n} more taps for debug mode",
+  "debug.empty": "No cards to share.",
+  "debug.copied": "Prefixes copied",
+  "debug.colChain": "Store",
+  "debug.colPrefix": "Starts with",
+  "debug.colLen": "Length",
+  "debug.colFormat": "Format",
+  "debug.subject": "FidUP! – card prefixes"
 };

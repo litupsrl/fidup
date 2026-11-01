@@ -28,7 +28,14 @@ Quando si aggiunge una carta, FidUP! suggerisce la catena **senza connessione e 
 
 - **Foto (OCR)**: con "Da foto" o "Scansiona", l'app legge anche le scritte della carta con Tesseract, che funziona interamente sul telefono. Se trova una catena in elenco (o il nome di una carta già salvata) compila il nome; altrimenti propone la scritta più grande. Il motore (circa 5 MB) si scarica dal sito solo al primo utilizzo e poi funziona offline.
 
-L'elenco delle catene e gli eventuali prefissi verificati sono in `chains.js`. Aggiungi solo prefissi controllati su carte reali.
+L'elenco delle catene e gli eventuali prefissi verificati sono in `chains.js`.
+
+### Modalità debug: raccolta dei prefissi
+Per costruire la tabella dei prefissi, chi vuole contribuire può attivare la **modalità debug**: Impostazioni → tocca **7 volte** la riga "Versione…" in fondo.
+- Compare la sezione **🛠 Modalità debug** con l'anteprima di ciò che verrà condiviso: per ogni carta solo **nome, primi caratteri** (al massimo 6 e mai più di metà del numero), **lunghezza e formato**. I link nei QR sono esclusi.
+- **Invia prefissi** apre il menu di condivisione (email, WhatsApp…), oppure un'email precompilata se in `config.js` è impostato `prefixEmail`. **Copia** mette il testo negli appunti.
+- Formato del testo: `chain;prefix;length;format;type`, pronto per un foglio di calcolo.
+- Nulla viene inviato automaticamente. La modalità si spegne con "Disattiva modalità debug". Aggiungi solo prefissi controllati su carte reali.
 
 ## 1. Pubblicazione gratuita su HTTPS (obbligatorio)
 

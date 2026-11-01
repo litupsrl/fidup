@@ -196,5 +196,20 @@
   'migrate.ok': 'Recommencer',
   'migrate.done': 'Mise à jour terminée : désormais l\'app s\'ouvre sans code',
   'installed.toast': 'FidUP! installée ✔ Ouvrez-la depuis l\'écran d\'accueil',
-  'copy.done': 'Lien copié : collez-le dans Safari ou Chrome'
+  'copy.done': 'Lien copié : collez-le dans Safari ou Chrome',
+  "debug.title": "🛠 Mode débogage",
+  "debug.text": "Aidez à améliorer la reconnaissance des enseignes. <b>Seuls</b> le nom de l'enseigne, les premiers caractères, la longueur et le format du code sont partagés : <b>jamais le numéro complet</b>. Vous voyez ci-dessous exactement ce qui sera envoyé.",
+  "debug.send": "📤 Envoyer les préfixes",
+  "debug.copy": "📋 Copier",
+  "debug.off": "Désactiver le mode débogage",
+  "debug.on": "Mode débogage activé",
+  "debug.offDone": "Mode débogage désactivé",
+  "debug.tapsLeft": "Encore {n} touches pour le mode débogage",
+  "debug.empty": "Aucune carte à partager.",
+  "debug.copied": "Préfixes copiés",
+  "debug.colChain": "Enseigne",
+  "debug.colPrefix": "Début",
+  "debug.colLen": "Longueur",
+  "debug.colFormat": "Format",
+  "debug.subject": "FidUP! – préfixes des cartes"
 };

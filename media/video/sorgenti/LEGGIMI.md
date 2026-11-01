@@ -1,6 +1,9 @@
 # Presentazione video FidUP!
 
-`../fidup-presentazione.mp4`: 1080×1920 (verticale), 46 s, H.264 + AAC, volume -16 LUFS (standard social).
+- `../fidup-presentazione.mp4`: italiano, 46 s, voce `if_sara`.
+- `../fidup-presentation-en.mp4`: inglese, 45 s, voce `af_heart`; schermate dell'app in inglese con carte dimostrative (`shots_en.js`).
+
+Entrambi 1080×1920 (verticale), H.264 + AAC, volume -16 LUFS (standard social). File con suffisso `_en` = versione inglese.
 
 Come è fatta:
 - **Voce**: Kokoro-82M (licenza Apache-2.0), voce italiana `if_sara`, generata in locale con `voice.py`.

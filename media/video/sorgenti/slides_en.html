@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><style>
+:root{--black:#3A3A3A;--green:#B1C900;--light:#EEF3CF}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,sans-serif}
+.s{width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.dark{background:var(--black);color:#fff}.lightbg{background:var(--light);color:var(--black)}.white{background:#f4f4f2;color:var(--black)}
+h1{font-size:92px;font-weight:800;letter-spacing:-2px;line-height:1.08;margin:0 70px}
+h2{font-size:74px;font-weight:800;letter-spacing:-1.5px;line-height:1.12;margin:0 80px}
+p.sub{font-size:46px;font-weight:600;margin:34px 90px 0;line-height:1.3}
+.g{color:var(--green)}.gd{color:#6E7D00}
+.phone{width:620px;height:1300px;border-radius:84px;background:#111;padding:22px;box-shadow:0 40px 90px rgba(0,0,0,.35);margin-top:70px}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:64px;display:block}
+.bar{position:absolute;left:0;top:0;bottom:0;width:22px;background:var(--green)}
+.cards{position:relative;width:760px;height:560px;margin:60px 0 40px}
+.card{position:absolute;width:560px;height:353px;border-radius:44px;box-shadow:0 26px 50px rgba(0,0,0,.28);left:100px;top:100px;color:#fff;font-weight:800;font-size:46px;padding:40px;text-align:left}
+.checks{list-style:none;padding:0;margin:0 0 0 0;text-align:left}
+.checks li{font-size:76px;font-weight:800;margin:26px 0;letter-spacing:-1px}.checks li::before{content:"✓ ";color:var(--green)}
+.lock{width:300px;height:300px;border-radius:80px;background:var(--black);display:flex;align-items:center;justify-content:center;margin-bottom:70px;box-shadow:0 30px 60px rgba(0,0,0,.25)}
+.qrbox{background:#fff;border-radius:50px;padding:46px;margin:60px 0 40px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.url{font-size:50px;font-weight:700;color:var(--green);margin-top:20px}
+.badge{display:inline-block;background:var(--green);color:var(--black);font-weight:800;font-size:48px;padding:18px 44px;border-radius:60px;margin-top:40px}
+</style></head><body>
+
+<section class="s dark" id="s0">
+  <img src="fidup-logo-negativo.svg" style="width:820px">
+  <p class="sub" style="margin-top:80px">All your loyalty cards,<br><span class="g">in one app.</span></p>
+</section>
+
+<section class="s lightbg" id="s1">
+  <h2>No more wallets<br>stuffed with cards</h2>
+  <div class="cards">
+    <div class="card" style="background:#2A2A2A;transform:rotate(-16deg) translate(-40px,-10px)"></div>
+    <div class="card" style="background:var(--green);transform:rotate(-6deg)"></div>
+    <div class="card" style="background:#fff;transform:rotate(6deg) translate(40px,40px);color:#3A3A3A;display:flex;align-items:center;justify-content:center"><img src="fidup-logo.svg" style="width:380px"></div>
+  </div>
+  <p class="sub">Your cards, <span class="gd">always with you</span><br>on your phone.</p>
+</section>
+
+<section class="s white" id="s2">
+  <h2>Your code at the checkout<br><span class="gd">with one tap</span></h2>
+  <div class="phone"><img src="en-list.png"></div>
+</section>
+
+<section class="s white" id="s3">
+  <h2>Scan or snap a photo:<br><span class="gd">it recognises the store</span></h2>
+  <div class="phone"><img src="en-edit.png"></div>
+</section>
+
+<section class="s dark" id="s4"><div class="bar"></div>
+  <ul class="checks">
+    <li>No sign-up</li>
+    <li>No data in the cloud</li>
+    <li>No profiling</li>
+  </ul>
+  <p class="sub" style="margin-top:80px">Everything encrypted on your device,<br><span class="g">works offline too!</span></p>
+</section>
+
+<section class="s lightbg" id="s5">
+  <div class="lock"><svg viewBox="0 0 24 24" width="170" height="170"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="#B1C900"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="#B1C900" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1.6" fill="#3A3A3A"/></svg></div>
+  <h2>Changing phones?</h2>
+  <p class="sub">Encrypted backup<br><span class="gd">only you can open.</span></p>
+</section>
+
+<section class="s dark" id="s6">
+  <img src="fidup-logo-negativo.svg" style="width:560px">
+  <div class="qrbox"><img src="fidup-qr.svg" style="width:520px;display:block"></div>
+  <div style="font-size:52px;font-weight:700">Scan and add it to your Home Screen</div>
+  <div class="url">litupsrl.github.io/fidup</div>
+  <div class="badge">Free</div>
+</section>
+</body></html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!-- FidUP! — Copyright LITUP S.r.l. · Materiale di comunicazione -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#3A3A3A">
+  <title>FidUP! – Media</title>
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <style>
+    :root { --black: #3A3A3A; --green: #B1C900; --green-text: #6E7D00; --bg: #f4f4f2; --card: #fff; --line: #deded8; --muted: #6b6b6b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; background: var(--bg); color: #1f1f1f; }
+    a { color: var(--green-text); }
+    header { background: var(--black); color: #fff; padding: 28px 20px 26px; }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    header .wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    header img { height: 64px; }
+    header h1 { margin: 0; font-size: 26px; }
+    header p { margin: 4px 0 0; color: #d6d6d6; }
+    header .en { color: var(--green); font-size: 14px; }
+    main { padding: 28px 20px 40px; }
+    h2 { font-size: 22px; margin: 34px 0 6px; }
+    h2:first-child { margin-top: 0; }
+    .lead { margin: 0 0 18px; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+    .item { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+    .item .thumb { display: block; background: #e9e9e6; aspect-ratio: 210 / 297; }
+    .item .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .item .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .item h3 { margin: 0; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+    .item h3 small { color: var(--muted); font-weight: 400; font-size: 13px; }
+    .btns { display: flex; gap: 8px; margin-top: auto; }
+    .btn { flex: 1; display: inline-block; text-align: center; text-decoration: none; padding: 9px 10px; border-radius: 10px; font-weight: 600; font-size: 14px;
+      border: 1px solid var(--line); color: #1f1f1f; background: #fff; }
+    .btn.primary { background: var(--black); color: #fff; border-color: var(--black); }
+    .btn:hover { border-color: var(--green); }
+    .assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+    .asset { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .asset .prev { height: 120px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #fff; }
+    .asset .prev.dark { background: var(--black); }
+    .asset .prev img { max-height: 100px; max-width: 90%; }
+    .asset h3 { margin: 0; font-size: 16px; }
+    .note { font-size: 14px; color: var(--muted); }
+    .cta { margin-top: 30px; background: var(--black); color: #fff; border-radius: 16px; padding: 18px 20px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; }
+    .cta b { color: var(--green); }
+    .cta a { color: #fff; }
+    @media (max-width: 560px) {
+      .grid, .assets { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .btns { flex-direction: column; gap: 6px; }
+      .item h3 { font-size: 15px; } .asset .prev { height: 90px; } .asset .prev img { max-height: 70px; }
+      header img { height: 48px; } header h1 { font-size: 22px; }
+    }
+    footer { text-align: center; font-size: 13px; color: var(--muted); padding: 0 20px 30px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <img src="../brand/fidup-logo-negativo.svg" alt="FidUP!">
+      <div>
+        <h1>Media</h1>
+        <p>Volantini, QR code e logo per far conoscere FidUP!</p>
+        <p class="en">Flyers, QR code and logos to share FidUP!</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h2>Volantini <small class="note">· Flyers</small></h2>
+    <p class="lead">Formato A4. Il <b>PDF</b> è per la stampa, il <b>PNG</b> per social e messaggi. Tocca l'anteprima per aprire il PDF.</p>
+    <div class="grid">
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino.pdf" target="_blank" rel="noopener"><img src="anteprime/it.jpg" alt="Volantino in italiano" loading="lazy"></a>
+        <div class="body"><h3>🇮🇹 Italiano</h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino.png" download>PNG</a></div></div>
+      </article>
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino-en.pdf" target="_blank" rel="noopener"><img src="anteprime/en.jpg" alt="Flyer in English" loading="lazy"></a>
+        <div class="body"><h3>🇬🇧 English</h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino-en.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino-en.png" download>PNG</a></div></div>
+      </article>
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino-fr.pdf" target="_blank" rel="noopener"><img src="anteprime/fr.jpg" alt="Dépliant en français" loading="lazy"></a>
+        <div class="body"><h3>🇫🇷 Français</h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino-fr.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino-fr.png" download>PNG</a></div></div>
+      </article>
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino-de.pdf" target="_blank" rel="noopener"><img src="anteprime/de.jpg" alt="Flyer auf Deutsch" loading="lazy"></a>
+        <div class="body"><h3>🇩🇪 Deutsch</h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino-de.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino-de.png" download>PNG</a></div></div>
+      </article>
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino-es.pdf" target="_blank" rel="noopener"><img src="anteprime/es.jpg" alt="Folleto en español" loading="lazy"></a>
+        <div class="body"><h3>🇪🇸 Español</h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino-es.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino-es.png" download>PNG</a></div></div>
+      </article>
+      <article class="item">
+        <a class="thumb" href="../qr/fidup-volantino-zh.pdf" target="_blank" rel="noopener"><img src="anteprime/zh.jpg" alt="中文宣传单" loading="lazy"></a>
+        <div class="body"><h3>🇨🇳 中文 <small>简体</small></h3>
+          <div class="btns"><a class="btn primary" href="../qr/fidup-volantino-zh.pdf" download>PDF</a><a class="btn" href="../qr/fidup-volantino-zh.png" download>PNG</a></div></div>
+      </article>
+    </div>
+
+    <h2>QR code e logo <small class="note">· QR code &amp; logos</small></h2>
+    <p class="lead">Il QR code porta a <a href="https://litupsrl.github.io/fidup/">litupsrl.github.io/fidup</a>. Per la stampa usa i file <b>SVG</b>, che restano nitidi a qualsiasi dimensione.</p>
+    <div class="assets">
+      <div class="asset">
+        <div class="prev"><img src="../qr/fidup-qr.svg" alt="QR code FidUP!"></div>
+        <h3>QR code</h3>
+        <div class="btns"><a class="btn primary" href="../qr/fidup-qr.svg" download>SVG</a><a class="btn" href="../qr/fidup-qr.png" download>PNG</a></div>
+      </div>
+      <div class="asset">
+        <div class="prev"><img src="../brand/fidup-logo.svg" alt="Logo FidUP!"></div>
+        <h3>Logo</h3>
+        <div class="btns"><a class="btn primary" href="../brand/fidup-logo.svg" download>SVG</a><a class="btn" href="../brand/fidup-logo.png" download>PNG</a></div>
+      </div>
+      <div class="asset">
+        <div class="prev dark"><img src="../brand/fidup-logo-negativo.svg" alt="Logo FidUP! negativo"></div>
+        <h3>Logo negativo</h3>
+        <div class="btns"><a class="btn primary" href="../brand/fidup-logo-negativo.svg" download>SVG</a><a class="btn" href="../brand/fidup-logo-negativo.png" download>PNG</a></div>
+      </div>
+      <div class="asset">
+        <div class="prev"><img src="../brand/fidup-icon-app.svg" alt="Icona app FidUP!" style="border-radius:22%"></div>
+        <h3>Icona dell'app</h3>
+        <div class="btns"><a class="btn primary" href="../brand/fidup-icon-app.svg" download>SVG</a><a class="btn" href="../brand/fidup-icon-app-1024.png" download>PNG</a></div>
+      </div>
+    </div>
+    <p class="note">Colori: nero <b>#3A3A3A</b> · verde <b>#B1C900</b>. Il nome dell'app si scrive sempre <b>FidUP!</b></p>
+
+    <div class="cta">
+      <span><b>FidUP!</b> — nessuna registrazione, nessun dato in cloud, nessun tipo di profilazione.</span>
+      <a href="../">Apri l'app →</a>
+    </div>
+  </main>
+
+  <footer>© LITUP S.r.l. · Il nome e il logo FidUP! sono di LITUP S.r.l. · <a href="../LICENSE.md">Licenza del software</a></footer>
+</body>
+</html>

@@ -1,8 +1,8 @@
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 794, height: 1123 }, deviceScaleFactor: 2 });
-  for (const l of ['en', 'fr', 'de', 'es', 'zh']) {
-    await p.goto(`file:///home/user/fidup/qr/volantino-${l}.html`); await p.waitForLoadState('networkidle'); await p.evaluate(() => document.fonts.ready);
+  for (const l of ['it', 'en', 'fr', 'de', 'es', 'zh']) {
+    await p.goto(`file:///home/user/fidup/qr/volantino${l === 'it' ? '' : '-' + l}.html`); await p.waitForLoadState('networkidle'); await p.evaluate(() => document.fonts.ready);
     // adatta i testi lunghi: riga finale su una riga, pagina entro A4
     const fit = await p.evaluate(() => {
       const last = document.querySelector('.slogan .last'), box = document.querySelector('.slogan'), ul = document.querySelector('.slogan ul');
@@ -14,8 +14,8 @@ const { chromium } = require('playwright');
       return { last: fs, list: us, qr: q, overflow: document.documentElement.scrollHeight > 1124 };
     });
     console.log(l, JSON.stringify(fit));
-    await p.pdf({ path: `/home/user/fidup/qr/fidup-volantino-${l}.pdf`, format: 'A4', printBackground: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
-    await p.screenshot({ path: `/home/user/fidup/qr/fidup-volantino-${l}.png` });
+    await p.pdf({ path: `/home/user/fidup/qr/fidup-volantino${l === 'it' ? '' : '-' + l}.pdf`, format: 'A4', printBackground: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
+    await p.screenshot({ path: `/home/user/fidup/qr/fidup-volantino${l === 'it' ? '' : '-' + l}.png` });
   }
   await b.close();
 })();

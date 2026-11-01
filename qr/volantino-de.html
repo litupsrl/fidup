@@ -27,6 +27,8 @@
   .qr img { width: 80mm; height: 80mm; }
   .qr h2 { margin: 4mm 0 1mm; font-size: 22pt; font-weight: 800; }
   .qr .url { font-size: 14pt; color: var(--green-text); font-weight: 600; }
+  .qr a { color: inherit; text-decoration: none; }
+  .qr .url a { border-bottom: 1.2pt solid var(--green); }
   .steps { margin-top: 7mm; width: 100%; display: grid; grid-template-columns: auto 1fr; gap: 2.5mm 6mm; font-size: 12.5pt; }
   .steps b { font-weight: 800; }
   .note { margin-top: auto; width: 100%; padding: 6mm 0 0; font-size: 9pt; color: #6b6b6b; line-height: 1.4; }
@@ -50,9 +52,9 @@
       <p class="last">Alles bleibt auf deinem Gerät, <span class="hl">funktioniert auch offline!</span></p>
     </section>
     <section class="qr">
-      <img src="fidup-qr.svg" alt="QR code">
+      <a href="https://litupsrl.github.io/fidup/"><img src="fidup-qr.svg" alt="QR code"></a>
       <h2>Mit der Kamera scannen</h2>
-      <div class="url">litupsrl.github.io/fidup</div>
+      <div class="url"><a href="https://litupsrl.github.io/fidup/">litupsrl.github.io/fidup</a></div>
     </section>
     <section class="steps">
       <b>iPhone</b><span>Safari oder Chrome → Teilen → <b>Zum Home-Bildschirm</b></span>

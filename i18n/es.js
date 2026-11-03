@@ -211,5 +211,6 @@
   "debug.colPrefix": "Empieza por",
   "debug.colLen": "Longitud",
   "debug.colFormat": "Formato",
-  "debug.subject": "FidUP! – prefijos de las tarjetas"
+  "debug.subject": "FidUP! – prefijos de las tarjetas",
+  "slogan.hide": "Ocultar"
 };

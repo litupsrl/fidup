@@ -5,7 +5,7 @@
 /* FidUP! — PWA con archivio cifrato locale (AES-256-GCM, chiave da PBKDF2-SHA256). */
 'use strict';
 
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.3.0';
 const KDF_ITERATIONS = 600000;
 const CFG = Object.assign({ googleClientId: '', microsoftClientId: '', cloudFileName: 'fidup-backup.json', prefixEmail: '' }, window.APP_CONFIG || {});
 
@@ -243,7 +243,15 @@ function sortedCards() {
   const cmp = mode === 'az' ? [byName] : mode === 'recent' ? [byRecent, byName] : [byUses, byRecent, byName];
   return [...S.data.cards].sort((a, b) => { for (const f of cmp) { const r = f(a, b); if (r) return r; } return 0; });
 }
+function placeSlogan() {
+  // chiuso con la × → si sposta in fondo all'elenco delle carte (scelta ricordata su questo dispositivo)
+  let bottom = false; try { bottom = localStorage.getItem('slogan_hidden') === '1'; } catch {}
+  const el = $('#slogan-list');
+  el.classList.toggle('at-bottom', bottom);
+  if (bottom) $('#slogan-bottom-slot').append(el); else $('#install-banner').before(el);
+}
 function renderList() {
+  placeSlogan();
   $('#sort').value = S.data.meta.sort || 'uses';
   const q = $('#search').value.trim().toLowerCase();
   const list = $('#card-list');
@@ -1013,6 +1021,7 @@ document.addEventListener('click', async (e) => {
       if (await askNewBackupPassword(t('bpw.newTitle'))) { toast(t('bpw.saved'), 4000); renderSettings(); }
       break;
     case 'wipe': wipe(); break;
+    case 'slogan-hide': try { localStorage.setItem('slogan_hidden', '1'); } catch {} placeSlogan(); break;
     case 'debug-send': debugSend(); break;
     case 'debug-copy': debugCopy(); break;
     case 'debug-off': localStorage.removeItem('debug'); toast(t('debug.offDone')); renderDebug(); break;

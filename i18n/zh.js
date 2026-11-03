@@ -212,5 +212,6 @@
   "debug.colPrefix": "开头",
   "debug.colLen": "长度",
   "debug.colFormat": "码制",
-  "debug.subject": "FidUP! – 会员卡前缀"
+  "debug.subject": "FidUP! – 会员卡前缀",
+  "slogan.hide": "隐藏"
 };

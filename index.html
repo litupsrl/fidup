@@ -107,7 +107,7 @@
         <button class="icon-btn" data-action="settings" data-i18n-attr="title:nav.settings,aria-label:nav.settings">⚙️</button>
       </div>
     </header>
-    <div class="slogan slogan-list"><p class="slogan-text" data-i18n="slogan.text"></p><p class="footnote" data-i18n="slogan.note"></p></div>
+    <div class="slogan slogan-list" id="slogan-list"><button type="button" class="slogan-close" data-action="slogan-hide" data-i18n-attr="aria-label:slogan.hide,title:slogan.hide">×</button><p class="slogan-text" data-i18n="slogan.text"></p><p class="footnote" data-i18n="slogan.note"></p></div>
     <div id="install-banner" class="install" hidden>
       <div class="install-head">
         <img src="icons/icon-192.png" alt="" class="install-icon">
@@ -148,6 +148,7 @@
       </select>
     </div>
     <ul id="card-list" class="card-grid"></ul>
+    <div id="slogan-bottom-slot"></div>
     <div id="empty" class="form center" hidden>
       <p class="muted" data-i18n="list.empty"></p>
       <p class="muted small" data-i18n="list.haveBackup"></p>

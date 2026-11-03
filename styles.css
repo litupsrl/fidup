@@ -146,3 +146,10 @@ details { margin: 12px 0; } summary { cursor: pointer; color: var(--muted); }
 .debug-preview td.mono { font-family: ui-monospace, Menlo, monospace; }
 .debug-preview tr:last-child td { border-bottom: 0; }
 #app-version { cursor: default; user-select: none; -webkit-user-select: none; }
+/* Slogan sopra l'elenco: chiudibile; se chiuso compare in fondo all'elenco */
+.slogan-close { position: absolute; top: 6px; right: 8px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255,255,255,.12);
+  color: #fff; font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.slogan-close:hover { background: rgba(255,255,255,.22); }
+.slogan-list:not(.at-bottom) .slogan-text { padding: 0 26px; }
+.slogan-list.at-bottom { margin-top: 18px; }
+.slogan-list.at-bottom .slogan-close { display: none; }

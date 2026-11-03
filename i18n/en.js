@@ -211,5 +211,6 @@
   "debug.colPrefix": "Starts with",
   "debug.colLen": "Length",
   "debug.colFormat": "Format",
-  "debug.subject": "FidUP! – card prefixes"
+  "debug.subject": "FidUP! – card prefixes",
+  "slogan.hide": "Hide"
 };

@@ -211,5 +211,6 @@
   "debug.colPrefix": "Début",
   "debug.colLen": "Longueur",
   "debug.colFormat": "Format",
-  "debug.subject": "FidUP! – préfixes des cartes"
+  "debug.subject": "FidUP! – préfixes des cartes",
+  "slogan.hide": "Masquer"
 };

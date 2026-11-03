@@ -213,5 +213,6 @@
   "debug.colPrefix": "Inizio",
   "debug.colLen": "Lunghezza",
   "debug.colFormat": "Formato",
-  "debug.subject": "FidUP! – prefissi delle carte"
+  "debug.subject": "FidUP! – prefissi delle carte",
+  "slogan.hide": "Nascondi"
 };
